@@ -1022,7 +1022,7 @@ const styles = StyleSheet.create({
     left: "11.7%",
   },
   navbar: {
-    top: 775,
+    top: 760,
   },
   home: {
     backgroundColor: Color.colorWhite1,

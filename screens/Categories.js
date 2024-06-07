@@ -468,7 +468,7 @@ const styles = StyleSheet.create({
     height: "56.23%",
   },
   navbar: {
-    top: 775,
+    top: 760,
   },
   categories: {
     backgroundColor: Color.colorWhite1,
