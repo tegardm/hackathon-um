@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Image } from "expo-image";
-import { StyleSheet, Pressable, View, Text } from "react-native";
+import { StyleSheet, Pressable, View, Text, TextInput } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { FontFamily, Border, Color, FontSize, Padding } from "../GlobalStyles";
 
@@ -31,9 +31,10 @@ const EditProfile = () => {
           contentFit="cover"
           source={require("../assets/vector20.png")}
         />
-        <Text style={[styles.tegarDeyustian, styles.vectorIconPosition]}>
-          Tegar Deyustian
-        </Text>
+        <TextInput
+            style={[styles.tegarDeyustian, styles.vectorIconPosition]}
+            placeholder="Tegar Deyustian"
+            />
       </View>
       <View style={[styles.rectangleGroup, styles.groupLayout]}>
         <View style={[styles.groupChild, styles.groupLayout]} />
@@ -42,9 +43,10 @@ const EditProfile = () => {
           contentFit="cover"
           source={require("../assets/vector20.png")}
         />
-        <Text style={[styles.tegarDeyustian, styles.vectorIconPosition]}>
-          03/30/3030
-        </Text>
+        <TextInput
+            style={[styles.tegarDeyustian, styles.vectorIconPosition]}
+            placeholder="03/30/3030"
+            />
       </View>
       <View style={[styles.rectangleContainer, styles.groupLayout]}>
         <View style={[styles.groupChild, styles.groupLayout]} />
@@ -53,9 +55,11 @@ const EditProfile = () => {
           contentFit="cover"
           source={require("../assets/vector20.png")}
         />
-        <Text style={[styles.tegarDeyustian, styles.vectorIconPosition]}>
-          tegardm@gmail.com
-        </Text>
+      
+        <TextInput
+            style={[styles.tegarDeyustian, styles.vectorIconPosition]}
+            placeholder="tegardm@gmail.com"
+            />
       </View>
       <Pressable
         style={[styles.savebutton, styles.titlePosition]}
@@ -85,8 +89,8 @@ const styles = StyleSheet.create({
     position: "absolute",
   },
   vectorIconPosition: {
-    top: "50%",
-    marginTop: -7,
+    justifyContent: "center",
+    top: "35%",
     position: "absolute",
   },
   titlePosition: {
@@ -142,7 +146,6 @@ const styles = StyleSheet.create({
     left: 25,
     fontSize: FontSize.size_mini,
     textDecoration: "underline",
-    lineHeight: 14,
     fontFamily: FontFamily.textSRegular,
     color: Color.colorBlack,
     width: 169,
@@ -168,7 +171,7 @@ const styles = StyleSheet.create({
   },
   savebutton: {
     marginLeft: -163.5,
-    top: 776,
+    top: 760,
     borderRadius: Border.br_7xs,
     backgroundColor: Color.colorMediumvioletred_100,
     width: 328,
