@@ -178,15 +178,17 @@ const styles = StyleSheet.create({
   },
   logout1Typo: {
     textAlign: "center",
+    alignItems: "center",
+    justifyContent: "center",
     color: Color.colorBlack,
     fontFamily: FontFamily.textSRegular,
-    lineHeight: 14,
     fontSize: FontSize.size_mini,
     position: "absolute",
+    top: 19,
   },
   vectorIconPosition1: {
     maxWidth: "100%",
-    top: "50%",
+    top: "40%",
     left: "7.69%",
     right: "87.38%",
     width: "4.92%",
@@ -206,11 +208,10 @@ const styles = StyleSheet.create({
     position: "absolute",
   },
   support1Typo: {
-    top: 22,
+    top: 20,
     textAlign: "center",
     color: Color.colorBlack,
     fontFamily: FontFamily.textSRegular,
-    lineHeight: 14,
     fontSize: FontSize.size_mini,
     position: "absolute",
   },
@@ -231,7 +232,7 @@ const styles = StyleSheet.create({
     position: "absolute",
   },
   homePosition: {
-    width: 34,
+    width: 38,
     left: "50%",
     bottom: "21.69%",
     top: "22.08%",
@@ -291,12 +292,11 @@ const styles = StyleSheet.create({
     backgroundColor: Color.colorWhite1,
   },
   logout1: {
-    top: 20,
+    top: 25,
     left: 115,
     width: 96,
   },
   vectorIcon: {
-    marginTop: -17,
     height: 15,
   },
   logout: {
@@ -307,11 +307,11 @@ const styles = StyleSheet.create({
   manageProfile: {
     left: 90,
     width: 146,
-    top: 23,
+    top: 25,
   },
   icon: {
     height: "22.76%",
-    top: "27.93%",
+    top: "40%",
     bottom: "49.31%",
     left: "7.69%",
     right: "87.38%",
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
     maxHeight: "100%",
   },
   manageprofileItem: {
-    top: 23,
+    top: 25,
   },
   manageprofile: {
     top: 272,
@@ -331,7 +331,6 @@ const styles = StyleSheet.create({
     width: 171,
   },
   vectorIcon1: {
-    marginTop: -18,
     height: 18,
   },
   notification: {
@@ -347,7 +346,6 @@ const styles = StyleSheet.create({
     top: 24,
   },
   vectorIcon2: {
-    marginTop: -16,
     height: 14,
   },
   support: {
@@ -360,7 +358,7 @@ const styles = StyleSheet.create({
     width: 182,
   },
   icon1: {
-    top: "19.83%",
+    top: "40%",
     bottom: "50%",
   },
   list: {
@@ -369,8 +367,8 @@ const styles = StyleSheet.create({
     width: 325,
   },
   icon2: {
-    top: "20.86%",
-    bottom: "48.97%",
+    top: "40%",
+    bottom: "50%",
   },
   create: {
     top: 482,
@@ -378,7 +376,7 @@ const styles = StyleSheet.create({
     width: 325,
   },
   name: {
-    height: "1.64%",
+    height: "3%",
     width: "24.17%",
     top: "23.69%",
     left: "38.68%",
@@ -493,7 +491,7 @@ const styles = StyleSheet.create({
     marginLeft: -150.5,
   },
   navbar: {
-    top: 775,
+    top: 760,
   },
   profile: {
     flex: 1,
