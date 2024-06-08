@@ -1,8 +1,9 @@
 import React from "react";
 import { Image } from "expo-image";
-import { StyleSheet, View, Text, Pressable } from "react-native";
+import { StyleSheet, View, Text, Pressable, TextInput } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { FontFamily, Color, FontSize, Padding, Border } from "../GlobalStyles";
+
 
 const LocationSelector = () => {
   const navigation = useNavigation();
@@ -23,7 +24,10 @@ const LocationSelector = () => {
             source={require("../assets/layer-2.png")}
           />
           <View style={styles.content}>
-            <Text style={styles.locationText}>Lapangan Rampal, Malang</Text>
+            <TextInput
+            style={styles.locationText}
+            placeholder="Lapangan Rampal, Malang"
+            />
           </View>
           <View style={styles.trailingElements}>
             <View style={styles.trailingIcon}>
@@ -90,10 +94,11 @@ const styles = StyleSheet.create({
   },
   selectorMenuBackground: {
     backgroundColor: Color.colorWhite1,
-    height: "100%",
+    height: "110%",
     width: "100%",
     position: "absolute",
     top: 0,
+
   },
   stateLayer: {
     position: "absolute",

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Image } from "expo-image";
-import { StyleSheet, Text, View, Pressable } from "react-native";
+import { StyleSheet, Text, View, Pressable, TextInput } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Border, FontFamily, Color, FontSize } from "../GlobalStyles";
 
@@ -101,9 +101,10 @@ Music Festival`}</Text>
       </View>
       <View style={[styles.searchbar, styles.searchbarLayout]}>
         <View style={[styles.stateLayer, styles.searchbarLayout]}>
-          <Text style={[styles.supportingText11, styles.supportingTypo]}>
-            Search
-          </Text>
+          <TextInput
+            style={[styles.supportingText11, styles.supportingTypo]}
+            placeholder="Search..."
+            />
           <View style={styles.trailingElements}>
             <View style={[styles.stTrailingIcon, styles.stateLayer1FlexBox]}>
               <View style={[styles.stateLayer1, styles.stateLayer1FlexBox]} />
@@ -469,7 +470,7 @@ const styles = StyleSheet.create({
     color: Color.colorDarkgray_200,
     fontFamily: FontFamily.textSRegular,
     fontSize: FontSize.textMMedium_size,
-    lineHeight: 24,
+    width: 250,
   },
   stateLayer1: {
     width: 40,
@@ -611,7 +612,7 @@ const styles = StyleSheet.create({
     height: "56.23%",
   },
   navbar: {
-    top: 775,
+    top: 760,
   },
   saved: {
     backgroundColor: Color.colorWhite1,
