@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Image, View, Text, StyleSheet, ScrollView, TextInput,ImageBackground, TouchableOpacity } from 'react-native'; // Import TextInput
+import { Image, View, Text, StyleSheet, ScrollView, TextInput,ImageBackground, TouchableOpacity, Pressable } from 'react-native'; // Import TextInput
 import { useNavigation } from "@react-navigation/native";
 import { Border, Color, FontFamily, FontSize } from "../GlobalStyles";
 import Icon from 'react-native-vector-icons/FontAwesome'; // Import the icon library
@@ -34,25 +34,27 @@ const SearchBar = ({ placeholder, onSearch }) => {
 
 
 const NavTop = () => {
-
+  const navigation = useNavigation();
 
   return (
     <View style={styles.navTop}>
       <View>
         <Text style={styles.cityNav}>
-          <Icon style={styles.navIcon} name="map-pin" size={17} color="gray" />
-          <Text>Nama Kota</Text>
+          <Image style={{margin:5}} source={require('../assets/layer-2.png')} />
+          <Text style={{fontSize:15, marginLeft:5,color:'gray'}}> Nama Kota</Text>
         </Text>
         <Text style={styles.usernameNav}>Username User</Text>
       </View>
       <View style={styles.navInfo}>
         <Icon name="bell" size={25} color="#ac1484" />
+        <Pressable onPress={() => navigation.navigate("Profile")}>
         <View style={styles.profileImageContainer}>
           <Image
             style={styles.navProfileImg}
             source={require("../assets/icon11.png")}
           />
         </View>
+        </Pressable>
       </View>
     </View>
   );
@@ -83,15 +85,13 @@ const EventCard = () => {
       </View>
       <View>
         <Text style={styles.eventTitle}>Title Event</Text>
-        <Text style={styles.eventDesc}>ini adalah deskripsi yang akan panjang tapi saya bingung</Text>
+        <Text style={styles.eventDesc}>ini adalah deskripsi yang akan panjang tapi saya bing....</Text>
 
         <Text style={styles.eventCity}>
-        <Icon name="location-arrow" size={12} color="gray" style={styles.searchIcon} />
-          Malang</Text>
+        <Icon name="location-arrow" size={12} color="gray" style={styles.searchIcon} /> Malang</Text>
         <View style={styles.dateDistance}>
           <Text style={styles.eventDate}>
-            <Icon padding={15} name="clock-o" size={12} color="gray" style={styles.searchIcon} />
-          14 June</Text>
+            <Icon padding={15} name="clock-o" size={12} color="gray" style={styles.searchIcon} /> 14 June</Text>
           <Text style={styles.eventDistance}>2.4 Km</Text>
         </View>
       </View>
@@ -100,25 +100,33 @@ const EventCard = () => {
 }
 
 const BottomNavBar = () => {
+  const navigation = useNavigation();
+
   return (
     <View style={styles.containerNavDown}>
-      <TouchableOpacity style={styles.buttonNavDown}>
-        <Ionicons name="home" size={24} color="white" />
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.buttonNavDown}>
-        <Ionicons name="list" size={24} color="white" />
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.buttonNavDown}>
-        <Ionicons name="person" size={24} color="white" />
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.buttonNavDown}>
-        <Ionicons name="calendar" size={24} color="white" />
-      </TouchableOpacity>
-    </View>
+      <Pressable style={styles.buttonNavDown} onPress={() => navigation.navigate("Home")}>
+        <Image source={require('../assets/vector9.png')}/>
+        <Text style={{fontSize:11, color:'white'}}>Home</Text>
+      </Pressable>
+      <Pressable style={styles.buttonNavDown}  onPress={() => navigation.navigate("Categories")}>
+      <Image source={require('../assets/vector23.png')}/>
+      <Text style={{fontSize:11, color:'white'}}>Categories</Text>
+      </Pressable>
+      <Pressable style={styles.buttonNavDown}  onPress={() => navigation.navigate("Saved")}>
+      <Image source={require('../assets/vector10.png')}/>
+      <Text style={{fontSize:11, color:'white'}}>Sekitar</Text>
+      </Pressable>
+      <Pressable style={styles.buttonNavDown}  onPress={() => navigation.navigate("Profile")}>
+      <Image  source={require('../assets/icon1.png')}/>
+      <Text style={{fontSize:11, color:'white'}}>Profile</Text>
+      </Pressable>   
+      </View>
   );
 };
 
 const Home = () => {
+  const navigation = useNavigation();
+
   const [searchText, setSearchText] = useState('');
 
   const handleSearch = (value) => {
@@ -131,11 +139,19 @@ const Home = () => {
       <NavTop />
       <SearchBar placeholder="Search..." onSearch={handleSearch} />
       <View style={styles.categories}>
+        <View style={{flexDirection:'row',alignItems:'center', justifyContent:'space-between'}}>
         <Text style={styles.categoriesTitle}>Categories</Text>
+        <Pressable onPress={() => navigation.navigate("Categories")}>
+        <Text style={{color:'#ac1484'}}>Lihat Lainnya</Text>
+        </Pressable>
+        </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View style={styles.categoriesItems}>
           <Category/>
           <Category/>
+          <Category/>
+          <Category/>
+
           <Category/>
           <Category/>
           {/* Tambahkan kategori tambahan di sini */}
@@ -144,7 +160,12 @@ const Home = () => {
 
       </View>
       <View style={{flex:1}}>
+      <View style={{flexDirection:'row',alignItems:'center', justifyContent:'space-between'}}>
       <Text style={styles.categoriesTitle}>Event Sekitar</Text>
+        <Pressable onPress={() => navigation.navigate("Saved")}>
+        <Text style={{color:'#ac1484'}}>Lihat Lainnya</Text>
+        </Pressable>
+        </View>
       <ScrollView vertical showsVerticalScrollIndicator={false}>
         <View style={styles.eventContainer}>
           <EventCard/>
@@ -191,8 +212,7 @@ const styles = StyleSheet.create({
     gap: 15,
   },
   cityNav: {
-    flexDirection: 'row',
-    gap: 20,
+    gap: 50,
     color: 'gray',
     fontSize: 17,
   },
@@ -317,16 +337,19 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'center',
     backgroundColor: '#ac1484',
-    padding: 10, // Padding horizontal untuk tombol
+    padding: 5, // Padding horizontal untuk tombol
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
     width: '100%',
+    textAlign:'center',
     zIndex: 999, // Menentukan navbar berada di layer terdepan
   },
   buttonNavDown: {
     padding: 10,
+    textAlign:'center',
+    alignItems:'center'
   },
 });
 

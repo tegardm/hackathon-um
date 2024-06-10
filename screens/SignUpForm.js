@@ -22,18 +22,29 @@ const SignUpForm = () => {
       <Text style={styles.title}>Daftar Untuk Lanjut</Text>
 
       <InputField
-        label="Full name"
-        value="Aayush Kriti"
+        label="Username"
+        value=""
         containerStyle={styles.inputContainer}
       />
       <InputField
-        label="Email address"
-        value="aayush.kriti3@gmail.com"
+        label="Alamat Email"
+        value=""
+        containerStyle={styles.inputContainer}
+      />
+      <InputField
+        label="Kota Domisili"
+        value=""
         containerStyle={styles.inputContainer}
       />
       <InputField
         label="Password"
-        value="..................."
+        value=""
+        containerStyle={styles.inputContainer}
+        secureTextEntry
+      />
+      <InputField
+        label="Repeat Password"
+        value=""
         containerStyle={styles.inputContainer}
         secureTextEntry
       />
@@ -83,7 +94,7 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   title: {
-    fontSize: 42,
+    fontSize: 30,
     color: "#FFFFFF",
     textAlign: "center",
     marginBottom: 30,
