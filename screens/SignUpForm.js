@@ -3,9 +3,9 @@ import {useState} from 'react';
 import { StyleSheet, View, Text, Pressable, TextInput } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
-import {firebase, auth} from "../firebase"
+import {firebase, auth, db} from "../firebase"
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-
+import { doc, setDoc } from 'firebase/firestore';
 const SignUpForm = () => {
   const navigation = useNavigation()
   const [username, setUsername] = useState('')
@@ -15,13 +15,28 @@ const SignUpForm = () => {
   const [domisili, setDomisili] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   
+  const handleUsernameChange = (e) => {
+    const username = e.nativeEvent.text;
+    setUsername(username);
+  };
+
+  const handleEmailChange = (e) => {
+    const email = e.nativeEvent.text;
+    setEmail(email);
+  };
+
+  const handleDomisiliChange = (e) => {
+    const domisili = e.nativeEvent.text;
+    setDomisili(domisili);
+  };
+
   const handleSignup = () => {
     if(password === ""){
       console.log("password harus sama");
       console.log("data log:", password, email);
     }else{
-      console.log("data log:", password, email);
-      //signUp(email, password, username, domisili);
+      console.log("data log:", username, email, domisili);
+      signUp(email, password, username, domisili);
     }
   }
 
@@ -30,17 +45,22 @@ const SignUpForm = () => {
       // Create user with email and password
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-  
+      console.log(user.email);
       // Save the username in Firestore
-      await firebase.firestore().collection('users').doc(user.uid).set({
-        username: username,
-        email: email,
-        domisili: domisili
+      await setDoc(doc(db, 'users', user.uid), {
+        Username: username,
+        Email: email,
+        Domisili: domisili
       });
   
       console.log('User signed up and username saved');
     } catch (error) {
       console.error('Error signing up:', error);
+    console.error("Error message:", error.message);
+    console.error("Error code:", error.code);
+    console.error("Error details:", error.details);
+    console.error("Native error code:", error.nativeErrorCode);
+    console.error("Native error message:", error.nativeErrorMessage);
     }
   };
 
@@ -61,47 +81,55 @@ const SignUpForm = () => {
 
       <Text style={styles.title}>Daftar Untuk Lanjut</Text>
 
-      <InputField
-        label="Username"
-        value={username}
-        onChange={text => setUsername(text)}
-        containerStyle={styles.inputContainer}
-      />
-      <InputField
-        label="Alamat Email"
-        value={email}
-        onChangeText={text => setEmail(text)}
-        autoCompleteType="email"
-        containerStyle={styles.inputContainer}
-        keyboardType="email-address"
-        textContentType="emailAddress"
-      />
-      <InputField
-        label="Kota Domisili"
-        value={domisili}
-        onChangeText={text => setDomisili(text)}
-        containerStyle={styles.inputContainer}
-      />
-      <InputField
-        label="Password"
-        onChangeText={text => setPassword(text)}
-        value={password}
-        containerStyle={styles.inputContainer}
-        secureTextEntry
-      />
-      <InputField
-        label="Repeat Password"
-        value={passwordRp}
-        onChangeText={text => setPasswordRp(text)}
-        containerStyle={styles.inputContainer}
-        secureTextEntry
-      />
+      <View style={[styles.inputField, styles.inputContainer]}>
+        <Text style={styles.label}>Username</Text>
+        <TextInput
+          style={styles.input}
+          value={username}
+          onChange={handleUsernameChange}
+        />
+      </View>
+      <View style={[styles.inputField, styles.inputContainer]}>
+        <Text style={styles.label}>Alamat Email</Text>
+        <TextInput
+          style={styles.input}
+          value={email}
+          onChangeText={text => setEmail(text)}
+        />
+      </View>
+      <View style={[styles.inputField, styles.inputContainer]}>
+        <Text style={styles.label}>Kota Domisili</Text>
+        <TextInput
+          style={styles.input}
+          value={domisili}
+          onChangeText={text => setDomisili(text)}
+        />
+      </View>
+      <View style={[styles.inputField, styles.inputContainer]}>
+        <Text style={styles.label}>Password</Text>
+        <TextInput
+          style={styles.input}
+          value={password}
+          onChangeText={text => setPassword(text)}
+          secureTextEntry
+        />
+      </View>
+      <View style={[styles.inputField, styles.inputContainer]}>
+        <Text style={styles.label}>Repeat Password</Text>
+        <TextInput
+          style={styles.input}
+          value={passwordRp}
+          onChangeText={text => setPasswordRp(text)}
+          secureTextEntry
+        />
+      </View>
+      
 
       <Pressable
         style={styles.createButton}
         onPress={handleSignup}
       >
-        <Text style={styles.createButtonText}>Create account</Text>
+      <Text style={styles.createButtonText}>Create account</Text>
       </Pressable>
       
       <Pressable
@@ -129,6 +157,8 @@ const InputField = ({ label, value, onChangeText, containerStyle, secureTextEntr
     />
   </View>
 );
+
+
 
 const styles = StyleSheet.create({
   signupForm: {
