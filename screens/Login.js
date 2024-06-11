@@ -42,7 +42,7 @@ const Login = () => {
           style={styles.inputText}
           placeholder="Email address"
           placeholderTextColor={Color.colorGray_400}
-          onChangeText={setEmail}
+          onChangeText={text => setEmail(text)}
           value={email}
           autoCompleteType="email"
           keyboardType="email-address"
@@ -55,7 +55,7 @@ const Login = () => {
           style={styles.inputText}
           placeholder="Password"
           placeholderTextColor={Color.colorGray_400}
-          onChangeText={setPassword}
+          onChangeText={text => setPassword(text)}
           value={password}
           secureTextEntry
           textContentType="password"
