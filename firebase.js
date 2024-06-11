@@ -6,10 +6,11 @@ import { initializeApp } from "firebase/app";// TODO: Add SDKs for Firebase prod
 // https://firebase.google.com/docs/web/setup#available-libraries
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
+import{FIREBASE_API_KEY} from '@env';
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyAaTYzF6vVifnD6ICdt_zeETQ-nRZTYEKs",
+  apiKey: {FIREBASE_API_KEY},
   authDomain: "eventa-stand.firebaseapp.com",
   projectId: "eventa-stand",
   storageBucket: "eventa-stand.appspot.com",
