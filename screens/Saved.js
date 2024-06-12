@@ -127,7 +127,10 @@ const styles = StyleSheet.create({
   },
   acaraTitle : {
    fontSize : 21,
-  fontWeight:'bold'
+  fontWeight:'bold',
+  paddingBottom : 10,
+  borderBottomWidth:3,
+  borderBottomColor:'#ac1484',
   },
   searchContainer: {
         marginHorizontal: 20,
@@ -166,7 +169,10 @@ const styles = StyleSheet.create({
   },
   eventCardContainer : {
     flexDirection:'row',
-    gap:15
+    gap:15,
+    paddingBottom : 10,
+    borderBottomWidth:1,
+    borderBottomColor:'lightgray'
   },
   eventTitle : {
     fontSize :18,
@@ -220,7 +226,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ac1484',
     padding: 5, // Padding horizontal untuk tombol
     position: 'absolute',
-    bottom:190,
+    bottom:205,
     left: 0,
     right: 0,
     width: '100%',

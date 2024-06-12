@@ -29,7 +29,7 @@ const BottomNavBar = () => {
   );
 };
 
-const EventCard = () => {
+const CategoriesCard = () => {
   return (
     <View style={styles.eventCardContainer}>
       <View>
@@ -55,18 +55,18 @@ const Categories = () => {
   return (
     <View>
       <View style={styles.container}>
-      <Text style={styles.categoriesTitle}>Categories</Text>
+      <Text style={styles.categoriesTitle}>Kategori Event</Text>
       <ScrollView vertical showsVerticalScrollIndicator={false}>
 
       <View style={styles.eventContainer}>
-      <EventCard/>
-      <EventCard/>
-      <EventCard/>
-      <EventCard/>
-      <EventCard/>
-      <EventCard/>
-      <EventCard/>
-      <EventCard/>
+      <CategoriesCard/>
+      <CategoriesCard/>
+      <CategoriesCard/>
+      <CategoriesCard/>
+      <CategoriesCard/>
+      <CategoriesCard/>
+      <CategoriesCard/>
+      <CategoriesCard/>
 
       </View>
       </ScrollView>
@@ -86,7 +86,10 @@ const styles = StyleSheet.create({
   },
   categoriesTitle : {
     fontSize : 21,
-    fontWeight:'bold'
+    fontWeight:'bold',
+    paddingBottom : 10,
+  borderBottomWidth:3,
+  borderBottomColor:'#ac1484',
   },
   containerNavDown: {
     flexDirection: 'row',
@@ -95,7 +98,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ac1484',
     padding: 6, // Padding horizontal untuk tombol
     position: 'absolute',
-    bottom: 25,
+    bottom: 41,
     left: 0,
     right: 0,
     width: '100%',
@@ -111,11 +114,15 @@ const styles = StyleSheet.create({
   eventContainer : {
     gap:10,
     paddingBottom:120,
-    marginTop:25
+    marginTop:25,
+    
   },
   eventCardContainer : {
     flexDirection:'row',
-    gap:15
+    gap:15,
+    paddingBottom : 10,
+    borderBottomWidth:1,
+    borderBottomColor:'lightgray'
   },
   eventTitle : {
     fontSize :15,
@@ -153,8 +160,8 @@ const styles = StyleSheet.create({
     fontSize : 12
   },
   boxEvent: {
-    width: 100,
-    height: 100,
+    width: 80,
+    height: 80,
     borderRadius: 20,
     backgroundColor: '#ffffff', // Ganti dengan gambar latar belakang
     elevation: 5,

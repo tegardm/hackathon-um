@@ -46,7 +46,10 @@ const NavTop = () => {
         <Text style={styles.usernameNav}>Username User</Text>
       </View>
       <View style={styles.navInfo}>
+        <Pressable onPress={() => navigation.navigate("Notification1")}>
         <Icon name="bell" size={25} color="#ac1484" />
+
+        </Pressable>
         <Pressable onPress={() => navigation.navigate("Profile")}>
         <View style={styles.profileImageContainer}>
           <Image
@@ -83,7 +86,7 @@ const EventCard = () => {
           imageStyle={{ borderRadius: 20 }}>
         </ImageBackground>
       </View>
-      <View>
+      <View >
         <Text style={styles.eventTitle}>Title Event</Text>
         <Text style={styles.eventDesc}>ini adalah deskripsi yang akan panjang tapi saya bing....</Text>
 
@@ -140,7 +143,7 @@ const Home = () => {
       <SearchBar placeholder="Search..." onSearch={handleSearch} />
       <View style={styles.categories}>
         <View style={{flexDirection:'row',alignItems:'center', justifyContent:'space-between'}}>
-        <Text style={styles.categoriesTitle}>Categories</Text>
+        <Text style={styles.categoriesTitle}>Kategori</Text>
         <Pressable onPress={() => navigation.navigate("Categories")}>
         <Text style={{color:'#ac1484'}}>Lihat Lainnya</Text>
         </Pressable>
@@ -286,7 +289,10 @@ const styles = StyleSheet.create({
   },
   eventCardContainer : {
     flexDirection:'row',
-    gap:15
+    gap:15,
+    paddingBottom : 10,
+    borderBottomWidth:1,
+    borderBottomColor:'lightgray'
   },
   eventTitle : {
     fontSize :18,

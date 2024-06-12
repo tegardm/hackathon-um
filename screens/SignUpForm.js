@@ -22,7 +22,7 @@ const SignUpForm = () => {
       <Text style={styles.title}>Daftar Untuk Lanjut</Text>
 
       <InputField
-        label="Username"
+        label="Nama Lengkap"
         value=""
         containerStyle={styles.inputContainer}
       />
