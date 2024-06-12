@@ -3,10 +3,12 @@ import { Image } from "expo-image";
 import { StyleSheet, Pressable, View, Text, TextInput } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { FontFamily, Border, Color, FontSize, Padding } from "../GlobalStyles";
+import { signOut } from "firebase/auth";
 
 const EditProfile = () => {
   const navigation = useNavigation();
 
+  
   return (
     <View style={styles.editprofile}>
       <Image

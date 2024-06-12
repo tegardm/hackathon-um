@@ -1,10 +1,11 @@
 import * as React from "react";
+import { useEffect } from "react";
 import {useState} from 'react';
 import { StyleSheet, View, Text, Pressable, TextInput } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import {firebase, auth, db} from "../firebase"
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 const SignUpForm = () => {
   const navigation = useNavigation()
@@ -14,7 +15,19 @@ const SignUpForm = () => {
   const [passwordRp, setPasswordRp] = useState('')
   const [domisili, setDomisili] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
-  
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, user => {
+      if(user){
+        console.log("Logged as:", user.email);
+        navigation.replace("Home")
+      }
+    })
+
+    return unsubscribe
+  }, [])
+
+
   const handleUsernameChange = (e) => {
     const username = e.nativeEvent.text;
     setUsername(username);
@@ -35,7 +48,6 @@ const SignUpForm = () => {
       console.log("password harus sama");
       console.log("data log:", password, email);
     }else{
-      console.log("data log:", username, email, domisili);
       signUp(email, password, username, domisili);
     }
   }

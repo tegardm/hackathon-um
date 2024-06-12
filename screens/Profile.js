@@ -3,11 +3,12 @@ import { Image, View, Text, StyleSheet, ScrollView, TextInput,ImageBackground, T
 import { useNavigation } from "@react-navigation/native";
 import { Color, FontFamily, FontSize, Border } from "../GlobalStyles";
 import Icon from 'react-native-vector-icons/FontAwesome'; // Import the icon library
-
-const ProfileButton = ({text}) => {
+import { signOut } from "firebase/auth";
+import {firebase, auth, db} from "../firebase"
+const ProfileButton = ({text, onPress}) => {
   return (
     <View style={styles.containerButton}>
-    <TouchableOpacity style={styles.buttonEach}>
+    <TouchableOpacity onPress={onPress} style={styles.buttonEach}>
       <Text style={styles.buttonText}>{text}</Text>
       <Image source={require('../assets/chevrondown.png')}/>
     </TouchableOpacity>
@@ -18,6 +19,8 @@ const ProfileButton = ({text}) => {
 
 const BottomNavBar = () => {
   const navigation = useNavigation();
+
+  
 
   return (
     <View style={styles.containerNavDown}>
@@ -42,6 +45,15 @@ const BottomNavBar = () => {
 };
 
 const Profile = () => {
+
+  const handleSignout = () => {
+    auth.signOut().then(() => {
+      console.log("Berhasil Logout");
+      navigation.replace("Login")
+    }).catch((error) => {
+      console.log(error);
+    })
+  }
   const navigation = useNavigation();
 
   return (
@@ -56,7 +68,7 @@ const Profile = () => {
       <ProfileButton text='Daftar Menjadi UMKM'/>
       <ProfileButton text='Buat Acara'/>
       <ProfileButton text='Dukungan'/>
-      <ProfileButton text='Keluar'/>
+      <ProfileButton text='Keluar' onPress={() => handleSignout()}/>
     </View>
   </View>
   <BottomNavBar/>
