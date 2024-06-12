@@ -3,6 +3,7 @@ import { Image, View, Text, StyleSheet, ScrollView, TextInput,ImageBackground, T
 import { useNavigation } from "@react-navigation/native";
 import { FontFamily, Border, Color, FontSize, Padding } from "../GlobalStyles";
 import Icon from 'react-native-vector-icons/FontAwesome'; // Import the icon library
+import { signOut } from "firebase/auth";
 
 const SearchBar = ({ placeholder, onSearch }) => {
   const [text, setText] = useState('');

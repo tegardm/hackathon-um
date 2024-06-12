@@ -1,9 +1,13 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Image } from "expo-image";
 import { StyleSheet, View, Text, Pressable, TextInput } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import { Color, FontFamily, FontSize, Border, Padding } from "../GlobalStyles";
+
+import {firebase, auth, db} from "../firebase"
+import { onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
 
 const Login = () => {
   const navigation = useNavigation();
@@ -11,14 +15,31 @@ const Login = () => {
   const [password, setPassword] = React.useState("");
   const [errorMessage, setErrorMessage] = React.useState("");
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, user => {
+      if(user){
+        console.log("Logged as:", user.email);
+        navigation.replace("Home")
+      }
+    })
+
+    return unsubscribe
+  }, [])
+
   const handleLogin = () => {
     if (email === "" || password === "") {
       setErrorMessage("Please fill in all fields");
     } else {
-      // Proceed with login logic
-      navigation.navigate("LocationSelector");
+      console.log("Email:", email, "Password:", password);
+      signInWithEmailAndPassword(auth, email, password).then(userCredentials =>{
+        const user = userCredentials.user;
+        console.log("Logged in using:", user.email);
+      }).catch(error => setErrorMessage(error.message))
+      
     }
   };
+
+
 
   return (
     <View style={styles.login}>
@@ -42,7 +63,7 @@ const Login = () => {
           style={styles.inputText}
           placeholder="Email address"
           placeholderTextColor={Color.colorGray_400}
-          onChangeText={setEmail}
+          onChangeText={text => setEmail(text)}
           value={email}
           autoCompleteType="email"
           keyboardType="email-address"
@@ -55,7 +76,7 @@ const Login = () => {
           style={styles.inputText}
           placeholder="Password"
           placeholderTextColor={Color.colorGray_400}
-          onChangeText={setPassword}
+          onChangeText={text => setPassword(text)}
           value={password}
           secureTextEntry
           textContentType="password"

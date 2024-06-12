@@ -3,13 +3,16 @@ import { Image, View, Text, StyleSheet, ScrollView, TextInput,ImageBackground, T
 import { useNavigation } from "@react-navigation/native";
 import { Color, FontFamily, FontSize, Border } from "../GlobalStyles";
 import Icon from 'react-native-vector-icons/FontAwesome'; // Import the icon library
-
+import { signOut } from "firebase/auth";
+import {firebase, auth, db} from "../firebase"
 const ProfileButton = ({text, address}) => {
   const navigation = useNavigation();
 
   const handlePress = () => {
     if (address && typeof address === 'string') {
-      navigation.navigate(address);
+     
+        navigation.navigate(address);
+       
     } else {
       console.warn('Invalid address:', address);
     }
@@ -28,9 +31,22 @@ const ProfileButton = ({text, address}) => {
   )
 }
 
+const LogoutButton = ({text, onPress}) => {
+  return (
+    <View style={styles.containerButton}>
+    <TouchableOpacity onPress={onPress} style={styles.buttonEach}>
+      <Text style={styles.buttonText}>{text}</Text>
+      <Image source={require('../assets/chevrondown.png')}/>
+    </TouchableOpacity>
+  </View>
+  )
+}
+
 
 const BottomNavBar = () => {
   const navigation = useNavigation();
+
+  
 
   return (
     <View style={styles.containerNavDown}>
@@ -55,9 +71,17 @@ const BottomNavBar = () => {
 };
 
 const Profile = () => {
+  const handleSignout = () => {
+    auth.signOut().then(() => {
+      console.log("Berhasil Logout");
+      navigation.replace("Login")
+    }).catch((error) => {
+      console.log(error);
+    })
+  }
+
   const navigation = useNavigation();
 
-  
   return (
     <View>
       <View style={styles.container}>
@@ -65,12 +89,12 @@ const Profile = () => {
     <Image style={{marginVertical:15}} source={require('../assets/profilepicture.png')}/>
     <Text style={styles.profileUsername}>Tegar Deyustian</Text>
     <View style={styles.containerButtons}>
-      <ProfileButton address='EditProfile' text='Atur Profil'/>
+    <ProfileButton address='EditProfile' text='Atur Profil'/>
       <ProfileButton address='Notification1' text='Notifikasi'/>
       <ProfileButton address='UploadUMKM' text='Daftar Menjadi UMKM'/>
       <ProfileButton address='Home' text='Buat Acara'/>
       <ProfileButton address='Home' text='Dukungan'/>
-      <ProfileButton address='SignUp' text='Keluar'/>
+      <LogoutButton  text='Keluar' onPress={() => handleSignout()}/>
     </View>
   </View>
   <BottomNavBar/>
@@ -87,10 +111,7 @@ const styles = StyleSheet.create({
   },
   profileTitle : {
     fontSize : 21,
-   fontWeight:'bold',
-   paddingBottom : 10,
-  borderBottomWidth:3,
-  borderBottomColor:'#ac1484',
+   fontWeight:'bold'
    },
    profileUsername : {
     fontSize : 18,
@@ -129,7 +150,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ac1484',
     padding: 5, // Padding horizontal untuk tombol
     position: 'absolute',
-    bottom: -52,
+    bottom: -65,
     left: 0,
     right: 0,
     width: '100%',

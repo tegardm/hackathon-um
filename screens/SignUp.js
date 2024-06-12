@@ -1,12 +1,25 @@
 import * as React from "react";
+import { useEffect } from "react";
 import { Image } from "expo-image";
 import { StyleSheet, View, Text, Pressable } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import { Color, FontFamily, Padding, Border, FontSize } from "../GlobalStyles";
-
+import {firebase, auth, db} from "../firebase"
+import { onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
 const SignUp = () => {
   const navigation = useNavigation();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, user => {
+      if(user){
+        console.log("Logged as:", user.email);
+        navigation.replace("Home")
+      }
+    })
+
+    return unsubscribe
+  }, [])
 
   return (
     <View style={styles.signup}>
