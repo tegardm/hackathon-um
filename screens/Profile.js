@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Image, View, Text, StyleSheet, ScrollView, TextInput,ImageBackground, TouchableOpacity, Pressable } from 'react-native'; // Import TextInput
+import { Image, View, Text, StyleSheet, Linking, ScrollView, TextInput,ImageBackground, TouchableOpacity, Pressable } from 'react-native'; // Import TextInput
 import { useNavigation } from "@react-navigation/native";
 import { Color, FontFamily, FontSize, Border } from "../GlobalStyles";
 import Icon from 'react-native-vector-icons/FontAwesome'; // Import the icon library
@@ -60,7 +60,7 @@ const BottomNavBar = () => {
       </Pressable>
       <Pressable style={styles.buttonNavDown}  onPress={() => navigation.navigate("Saved")}>
       <Image source={require('../assets/vector10.png')}/>
-      <Text style={{fontSize:11, color:'white'}}>Saved</Text>
+      <Text style={{fontSize:11, color:'white'}}>Sekitar</Text>
       </Pressable>
       <Pressable style={styles.buttonNavDown}  onPress={() => navigation.navigate("Profile")}>
       <Image  source={require('../assets/profile1335.png')}/>
@@ -71,10 +71,11 @@ const BottomNavBar = () => {
 };
 
 const Profile = () => {
+  
   const handleSignout = () => {
     auth.signOut().then(() => {
       console.log("Berhasil Logout");
-      navigation.replace("Login")
+      navigation.replace("SplashScreen")
     }).catch((error) => {
       console.log(error);
     })
@@ -92,8 +93,8 @@ const Profile = () => {
     <ProfileButton address='EditProfile' text='Atur Profil'/>
       <ProfileButton address='Notification1' text='Notifikasi'/>
       <ProfileButton address='UploadUMKM' text='Daftar Menjadi UMKM'/>
-      <ProfileButton address='Home' text='Buat Acara'/>
-      <ProfileButton address='Home' text='Dukungan'/>
+      <ProfileButton address='CreateEvent' text='Buat Acara'/>
+      <LogoutButton   onPress={() => Linking.openURL('https://example.com/syarat-berkas')} text='Dukungan'/>
       <LogoutButton  text='Keluar' onPress={() => handleSignout()}/>
     </View>
   </View>
@@ -111,8 +112,11 @@ const styles = StyleSheet.create({
   },
   profileTitle : {
     fontSize : 21,
-   fontWeight:'bold'
-   },
+  fontWeight:'bold',
+  paddingBottom : 10,
+  borderBottomWidth:3,
+  borderBottomColor:'#ac1484',
+  },
    profileUsername : {
     fontSize : 18,
    fontWeight:'bold'
@@ -150,7 +154,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ac1484',
     padding: 5, // Padding horizontal untuk tombol
     position: 'absolute',
-    bottom: -65,
+    bottom: -50,
     left: 0,
     right: 0,
     width: '100%',

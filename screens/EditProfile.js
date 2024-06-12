@@ -31,6 +31,20 @@ const SearchBar = ({ placeholder, onSearch }) => {
 const EditProfile = () => {
   const navigation = useNavigation();
 
+  const [searchName, setSearchName] = useState('Mohamad Tegar Deyustian Muslim');
+  const handleSearchName = (value) => {
+    setSearchName(value);
+  };
+
+  const [searchEmail, setSearchEmail] = useState('mohamad.tegar.2205336@students.um.ac.id');
+  const handleSearchEmail = (value) => {
+    setSearchEmail(value);
+  };
+
+  const [searchLocation, setSearchLocation] = useState('Malang');
+  const handleSearchLocation = (value) => {
+    setSearchLocation(value);
+  };
   return (
     <View style={styles.container}>
       <View style={styles.titleContainer}>
@@ -46,13 +60,13 @@ const EditProfile = () => {
 
       <Text style={{fontSize:18}}>Informasi Profile Anda</Text>
       <View style={styles.containerSearchs}>
-      <SearchBar placeholder="Mohamad Tegar Deyustian Muslim"  />
-      <SearchBar placeholder="mohamad.tegar.2205336@students.um.ac.id"  />
-      <SearchBar placeholder="Malang, Jawa Timur"  />
+      <SearchBar onSearch={handleSearchName} placeholder={searchName}  />
+      <SearchBar  onSearch={handleSearchEmail} placeholder={searchEmail}   />
+      <SearchBar onSearch={handleSearchLocation} placeholder={searchLocation}  />
 
       </View>
       <View style={styles.buttonContainer}>
-      <Pressable style={[styles.button, styles.cancelButton]} >
+      <Pressable onPress={() => navigation.navigate('Profile')} style={[styles.button, styles.cancelButton]} >
         <Text style={styles.buttonText}>Cancel</Text>
       </Pressable>
       <Pressable style={[styles.button, styles.saveButton]} >

@@ -10,7 +10,7 @@ import LocationSelector from "./screens/LocationSelector";
 import SignUpForm from "./screens/SignUpForm";
 import ChatNegotiation from "./screens/ChatNegotiation";
 import Categories from "./screens/Categories";
-import NewestEvent from "./screens/NewestEvent";
+import CreateEvent from "./screens/CreateEvent";
 import DetailCategory from "./screens/DetailCategory";
 import Profile from "./screens/Profile";
 import Notification1 from "./screens/Notification1";
@@ -18,7 +18,6 @@ import EditProfile from "./screens/EditProfile";
 import Saved from "./screens/Saved";
 import UploadUMKM from "./screens/UploadUMKM";
 import UploadReview from "./screens/UploadReview";
-import BuatEvent from "./screens/BuatEvent";
 import DetailEvent from "./screens/DetailEvent";
 import AprovedEvent from "./screens/AprovedEvent";
 
@@ -86,8 +85,8 @@ const App = () => {
               options={{ headerShown: false }}
             />
             <Stack.Screen
-              name="NewestEvent"
-              component={NewestEvent}
+              name="CreateEvent"
+              component={CreateEvent}
               options={{ headerShown: false }}
             />
             <Stack.Screen
@@ -125,11 +124,7 @@ const App = () => {
               component={UploadReview}
               options={{ headerShown: false }}
             />
-            <Stack.Screen
-              name="BuatEvent"
-              component={BuatEvent}
-              options={{ headerShown: false }}
-            />
+        
             <Stack.Screen
               name="DetailEvent"
               component={DetailEvent}

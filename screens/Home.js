@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { Image, View, Text, StyleSheet, ScrollView, TextInput,ImageBackground, TouchableOpacity, Pressable } from 'react-native'; // Import TextInput
 import { useNavigation } from "@react-navigation/native";
-import { Border, Color, FontFamily, FontSize } from "../GlobalStyles";
 import Icon from 'react-native-vector-icons/FontAwesome'; // Import the icon library
-import popps from '../assets/fonts/Poppins-Regular.ttf';
-
-import { Ionicons } from '@expo/vector-icons'; // Menggunakan Ionicons dari Expo
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth, db } from '../firebase';
 
 // Define the SearchBar component
 const SearchBar = ({ placeholder, onSearch }) => {
@@ -33,7 +31,7 @@ const SearchBar = ({ placeholder, onSearch }) => {
 
 
 
-const NavTop = () => {
+const NavTop = ({username}) => {
   const navigation = useNavigation();
 
   return (
@@ -43,7 +41,7 @@ const NavTop = () => {
           <Image style={{margin:5}} source={require('../assets/layer-2.png')} />
           <Text style={{fontSize:15, marginLeft:5,color:'gray'}}> Nama Kota</Text>
         </Text>
-        <Text style={styles.usernameNav}>Username User</Text>
+        <Text style={styles.usernameNav}>{username ? username : 'Username User'}</Text>
       </View>
       <View style={styles.navInfo}>
         <Pressable onPress={() => navigation.navigate("Notification1")}>
@@ -128,6 +126,20 @@ const BottomNavBar = () => {
 };
 
 const Home = () => {
+
+  const [username,setUsername] = useState()
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // Ambil username dari objek pengguna Firebase
+        setUsername(user.username);
+      }
+    });
+
+    return unsubscribe;
+  }, []);
+
   const navigation = useNavigation();
 
   const [searchText, setSearchText] = useState('');
@@ -139,7 +151,7 @@ const Home = () => {
   return (
     <View>
     <ScrollView   style={styles.container}>
-      <NavTop />
+      <NavTop username={username} />
       <SearchBar placeholder="Search..." onSearch={handleSearch} />
       <View style={styles.categories}>
         <View style={{flexDirection:'row',alignItems:'center', justifyContent:'space-between'}}>

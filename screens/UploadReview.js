@@ -1,15 +1,17 @@
 import * as React from "react";
-import { Text, StyleSheet, View } from "react-native";
+import { Text, StyleSheet, View,TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
 import { Padding, FontFamily, FontSize, Color, Border } from "../GlobalStyles";
+import { useNavigation } from "@react-navigation/native";
 
 const UploadReview = () => {
+  const navigation = useNavigation()
   return (
     <View style={styles.uploadreview}>
       <View style={[styles.info, styles.infoSpaceBlock]}>
         <Text style={styles.thankYouWe}>
-          Thank you, we have received your data. Please wait for our team to
-          validate.
+          Terimakasih, berkas anda akan segera kami terima dan dilakukan validasi, silahkan
+          tunggu informasi lebih lanjut dari fitur notifikasi
         </Text>
         <Text style={[styles.pengajuanAndaDalam, styles.tambahEventTypo]}>
           Pengajuan Anda Dalam Proses
@@ -22,11 +24,11 @@ const UploadReview = () => {
           source={require("../assets/2.png")}
         />
       </View>
-      <View style={[styles.button, styles.imagePosition]}>
+      <TouchableOpacity onPress={() => navigation.navigate('Home')} style={[styles.button, styles.imagePosition]}>
         <Text style={[styles.tambahEvent, styles.tambahEventTypo]}>
-          Back to Home
+          Kembali ke Home
         </Text>
-      </View>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -41,7 +43,7 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.textLSemiBold,
     fontWeight: "600",
     letterSpacing: 0.7,
-    fontSize: FontSize.headingSemibold_size,
+    fontSize: 15,
     textAlign: "center",
   },
   imagePosition: {

@@ -1,303 +1,198 @@
-import * as React from "react";
-import { Text, StyleSheet, View, Pressable } from "react-native";
-import { Image } from "expo-image";
+import React, { useState } from 'react';
+import { Image, View, Text, Linking,Button, StyleSheet, ScrollView, TextInput,ImageBackground, TouchableOpacity, Pressable } from 'react-native'; // Import TextInput
 import { useNavigation } from "@react-navigation/native";
-import { Padding, FontFamily, FontSize, Border, Color } from "../GlobalStyles";
 
-//Test Push
+const UMKMRegistrationScreen = () => {
+  const [isChecked, setIsChecked] = useState(false);
+  const navigation = useNavigation()
+  const [umkmName, setUmkmName] = useState('');
+  const [umkmLink, setUmkmLink] = useState('');
 
-const UploadUMKM = () => {
-  const navigation = useNavigation();
-
+  const [umkmDescription, setUmkmDescription] = useState('');
   return (
-    <View style={[styles.uploadumkm, styles.icon2Layout]}>
-      <View style={[styles.uploadField, styles.headerSpaceBlock]}>
-        <View style={styles.input}>
-          <View style={styles.label}>
-            <Text style={[styles.uploadProposal, styles.uploadTypo]}>
-              Upload Berkas Identitas
-            </Text>
-            <Text style={[styles.text, styles.uploadTypo]}>*</Text>
-          </View>
-          <View style={styles.inputField}>
-            <Text style={[styles.dragDropContainer, styles.uploadFileTypo]}>
-              <Text style={styles.dragDrop}>{`Drag & drop or `}</Text>
-              <Text style={styles.browse}>browse</Text>
-            </Text>
-          </View>
-        </View>
-        <View style={styles.input1}>
-          <View style={styles.label}>
-            <Text style={[styles.uploadProposal, styles.uploadTypo]}>
-              Upload Berkas Usaha
-            </Text>
-            <Text style={[styles.text, styles.uploadTypo]}>*</Text>
-          </View>
-          <View style={styles.inputField}>
-            <Text style={[styles.dragDropContainer, styles.uploadFileTypo]}>
-              <Text style={styles.dragDrop}>{`Drag & drop or `}</Text>
-              <Text style={styles.browse}>browse</Text>
-            </Text>
-          </View>
-        </View>
-        <View style={styles.button}>
-          <Image
-            style={[styles.icon, styles.iconLayout]}
-            contentFit="cover"
-            source={require("../assets/icon14.png")}
-          />
-          <Text style={[styles.downloadFormat, styles.uploadFileTypo]}>
-            Download Surat Pernyataan
-          </Text>
-        </View>
-        <View style={styles.input1}>
-          <View style={styles.label}>
-            <Text
-              style={[styles.uploadProposal2, styles.uploadTypo]}
-            >{`Upload Surat Pernyataan Dengan Tanda Tangan & Materai `}</Text>
-            <Text style={[styles.text, styles.uploadTypo]}>*</Text>
-          </View>
-          <View style={styles.inputField}>
-            <Text style={[styles.dragDropContainer, styles.uploadFileTypo]}>
-              <Text style={styles.dragDrop}>{`Drag & drop or `}</Text>
-              <Text style={styles.browse}>browse</Text>
-            </Text>
-          </View>
-        </View>
+    <View style={styles.container}>
+      <ScrollView style={{marginBottom:40}} vertical showsVerticalScrollIndicator={false}>
+      <View style={styles.titleContainer}>
+      <Pressable onPress={() => navigation.navigate('Profile')}>
+      <Image source={require('../assets/vector-7.png')}/>
+
+          </Pressable>
+      <Text style={styles.notifTitle}>Daftar Sebagai Pelaku UMKM</Text>
+
       </View>
-      <Text style={[styles.uploadFile, styles.uploadFileTypo]}>
-        Upload File
+      <Text style={styles.description}>
+        Halaman ini untuk pendaftaran sebagai Pelaku UMKM. Silakan lengkapi berkas-berkas berikut sebelum mendaftar.
       </Text>
-      <Image
-        style={[styles.uploadumkmChild, styles.uploadPosition]}
-        contentFit="cover"
-        source={require("../assets/vector-2.png")}
+      <TouchableOpacity onPress={() => Linking.openURL('https://example.com/syarat-berkas')}>
+        <Text style={styles.link}>Lihat persyaratan berkas identitas & usaha</Text>
+      </TouchableOpacity>
+      <Text style={styles.label}>Nama UMKM</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Nama UMKM Anda"
+        value={umkmName}
+        onChangeText={setUmkmName}
       />
-      <View style={[styles.header, styles.headerPosition]}>
-        <Pressable
-          style={styles.iconLayout}
-          onPress={() => navigation.navigate("Profile")}
-        >
-          <Image
-            style={[styles.icon2, styles.icon2Layout]}
-            contentFit="cover"
-            source={require("../assets/icon4.png")}
-          />
-        </Pressable>
-        <Text style={styles.daftarSebagaiPelaku}>
-          Daftar Sebagai Pelaku UMKM
+
+      <Text style={styles.label}>Deskripsi UMKM</Text>
+      <TextInput
+        style={styles.textArea}
+        placeholder="Deskripsi UMKM Anda"
+        value={umkmDescription}
+        onChangeText={setUmkmDescription}
+        multiline
+      />
+
+<Text style={styles.label}>Tautan Social Media UMKM</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Facebook / Instagram / Twitter"
+        value={umkmLink}
+        onChangeText={setUmkmLink}
+      />
+
+      <Text style={styles.label}>Upload Berkas Identitas (PDF)</Text>
+      
+      <TouchableOpacity style={styles.button}>
+        <Text style={styles.buttonText}>Pilih Berkas</Text>
+      </TouchableOpacity>
+
+      <Text style={styles.label}>Upload Berkas Usaha (PDF)</Text>
+      <TouchableOpacity style={styles.button}>
+        <Text style={styles.buttonText}>Pilih Berkas</Text>
+      </TouchableOpacity>      
+
+      <Text style={styles.label}>Download Surat Pernyataan</Text>
+      <TouchableOpacity onPress={() => Linking.openURL('https://example.com/syarat-berkas')}>
+        <Text style={styles.link}>Download Surat</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button}>
+        <Text style={styles.buttonText}>Upload Surat Pernyataan Dengan Tanda Tangan & Materai</Text>
+      </TouchableOpacity>  
+
+
+      <View style={styles.checkboxContainer}>
+        <TouchableOpacity onPress={() => setIsChecked(!isChecked)} style={styles.checkbox}>
+          {isChecked && <View style={styles.checked} />}
+        </TouchableOpacity>
+        <Text  style={styles.labelCheck}>Saya menyetujui kebijakan aplikasi EventaStand dan siap 
+          bertanggung jawab atas semua informasi saya.
         </Text>
-        <Image
-          style={[styles.icon, styles.iconLayout]}
-          contentFit="cover"
-          source={require("../assets/icon5.png")}
-        />
       </View>
-      <View style={[styles.buttonCta, styles.headerPosition]}>
-        <View style={[styles.button1, styles.buttonFlexBox]}>
-          <Text style={[styles.negotiate, styles.cancelTypo]}>Confirm</Text>
-        </View>
-        <View style={[styles.button2, styles.buttonFlexBox]}>
-          <Text style={[styles.cancel, styles.cancelTypo]}>Cancel</Text>
-        </View>
-      </View>
+
+     
+      </ScrollView>
+      <TouchableOpacity onPress={() => navigation.navigate('UploadReview')} 
+      style={[styles.button, styles.btnSubmit]}>
+        <Text style={[styles.buttonText, {fontWeight:'bold',fontSize:15}]}>Submit Berkas</Text>
+      </TouchableOpacity> 
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  icon2Layout: {
-    width: "100%",
-    overflow: "hidden",
+  container: {
+    paddingVertical: 40,
+    paddingHorizontal: 20,
+    // alignItems:'center'
   },
-  headerSpaceBlock: {
-    paddingVertical: Padding.p_xl,
-    paddingHorizontal: Padding.p_11xl,
+  description: {
+    marginBottom: 10,
+    fontSize: 16,
+    textAlign: 'justify',
   },
-  uploadTypo: {
-    textAlign: "left",
-    fontFamily: FontFamily.textMMedium,
-    fontWeight: "500",
-  },
-  uploadFileTypo: {
-    textAlign: "center",
-    fontSize: FontSize.textMMedium_size,
-  },
-  iconLayout: {
-    height: 24,
-    width: 24,
-  },
-  uploadPosition: {
-    left: "50%",
-    position: "absolute",
-  },
-  headerPosition: {
-    width: 393,
-    left: 0,
-    alignItems: "center",
-    flexDirection: "row",
-    position: "absolute",
-  },
-  buttonFlexBox: {
-    paddingHorizontal: Padding.p_xl,
-    width: 160,
-    borderRadius: Border.br_10xs,
-    paddingVertical: Padding.p_xs,
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "center",
-  },
-  cancelTypo: {
-    letterSpacing: 0.7,
-    fontSize: FontSize.headingSemibold_size,
-    fontFamily: FontFamily.textLSemiBold,
-    fontWeight: "600",
-    textAlign: "center",
-    flex: 1,
-  },
-  uploadProposal: {
-    color: Color.colorDark,
-    fontSize: FontSize.textMMedium_size,
-    textAlign: "left",
-  },
-  text: {
-    color: Color.colorAlert,
-    marginLeft: 4,
-    fontSize: FontSize.textMMedium_size,
-    textAlign: "left",
-    flex: 1,
+  link: {
+    color: 'blue',
+    textDecorationLine: 'underline',
+    marginBottom: 20,
   },
   label: {
-    flexDirection: "row",
-    alignSelf: "stretch",
-  },
-  dragDrop: {
-    color: Color.colorDark,
-  },
-  browse: {
-    textDecoration: "underline",
-    color: Color.colorMediumvioletred_100,
-  },
-  dragDropContainer: {
-    fontFamily: FontFamily.textSRegular,
-  },
-  inputField: {
-    backgroundColor: Color.colorLavenderblush,
-    borderStyle: "dashed",
-    paddingHorizontal: Padding.p_79xl,
-    paddingVertical: Padding.p_21xl,
-    marginTop: 10,
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: Color.colorMediumvioletred_100,
-    borderRadius: Border.br_7xs,
-    alignSelf: "stretch",
-    justifyContent: "center",
+    marginTop: 15,
+    marginBottom: 5,
+    fontSize: 14,
+    // fontWeight: 'bold',
   },
   input: {
-    justifyContent: "center",
-    width: 354,
-  },
-  input1: {
-    marginTop: 20,
-    justifyContent: "center",
-    width: 354,
-  },
-  icon: {
-    overflow: "hidden",
-  },
-  downloadFormat: {
-    marginLeft: 10,
-    color: Color.colorDark,
-    fontFamily: FontFamily.textMMedium,
-    fontWeight: "500",
-    textAlign: "center",
-  },
-  button: {
-    borderColor: Color.colorDark,
-    paddingHorizontal: Padding.p_3xs,
-    paddingVertical: Padding.p_xs,
-    borderStyle: "solid",
-    marginTop: 20,
-    alignItems: "center",
+    height: 40,
+    borderColor: '#ac1484',
     borderWidth: 1,
-    borderRadius: Border.br_7xs,
-    flexDirection: "row",
-    justifyContent: "center",
-    width: 354,
+    marginTop: 10,
+    paddingHorizontal: 10,
+    borderRadius: 5,
   },
-  uploadProposal2: {
-    fontSize: FontSize.size_2xs,
-    color: Color.colorDark,
-  },
-  uploadField: {
-    marginLeft: -207.5,
-    top: 153,
-    left: "50%",
-    position: "absolute",
-  },
-  uploadFile: {
-    marginLeft: -38.5,
-    top: 90,
-    color: Color.colorDark,
-    fontFamily: FontFamily.textMMedium,
-    fontWeight: "500",
-    textAlign: "center",
-    left: "50%",
-    position: "absolute",
-  },
-  uploadumkmChild: {
-    marginLeft: -99.5,
-    top: 115,
-    maxHeight: "100%",
-    width: 199,
-  },
-  icon2: {
-    height: "100%",
-    overflow: "hidden",
-  },
-  daftarSebagaiPelaku: {
-    fontSize: FontSize.textLSemiBold_size,
-    fontFamily: FontFamily.textLSemiBold,
-    fontWeight: "600",
-    textAlign: "center",
-    color: Color.colorDark,
-  },
-  header: {
-    top: 0,
-    justifyContent: "space-between",
-    paddingVertical: Padding.p_xl,
-    paddingHorizontal: Padding.p_11xl,
-  },
-  negotiate: {
-    color: Color.colorWhite1,
-  },
-  button1: {
-    backgroundColor: Color.colorMediumvioletred_100,
-  },
-  cancel: {
-    color: Color.colorMediumvioletred_100,
-  },
-  button2: {
-    marginLeft: 16,
-    borderStyle: "solid",
-    paddingHorizontal: Padding.p_xl,
-    width: 160,
-    borderRadius: Border.br_10xs,
+  textArea: {
+    height: 100,
+    borderColor: '#ac1484',
     borderWidth: 1,
-    borderColor: Color.colorMediumvioletred_100,
+    marginTop: 10,
+    paddingHorizontal: 10,
+    borderRadius: 5,
   },
-  buttonCta: {
-    top: 697,
-    padding: Padding.p_11xl,
-    justifyContent: "center",
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 20,
   },
-  uploadumkm: {
-    backgroundColor: Color.colorWhite1,
-    height: 852,
-    overflow: "hidden",
-    flex: 1,
+  checkbox: {
+    height: 20,
+    width: 20,
+    borderWidth: 2,
+    borderColor: '#ac1484',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
   },
+  checked: {
+    width: 12,
+    height: 12,
+    backgroundColor: '#ac1484',
+  },
+  labelCheck : {
+    fontSize: 13,
+    // fontWeight: 'bold',
+    fontStyle:'italic',
+    width:'93%'
+ },
+  submitButton: {
+    marginTop: 30,
+  },
+  
+  notifTitle : {
+    fontSize : 19,
+    fontWeight:'bold',
+   
+    },
+    titleContainer : {
+      flexDirection : 'row',
+      alignItems:'center',
+      width:'100%',
+      paddingBottom :15,
+      marginBottom :15,
+      borderBottomWidth:3,
+      borderBottomColor:'#ac1484',
+      justifyContent:'space-between'
+    },
+    button: {
+      backgroundColor: '#ac1484',
+      borderRadius: 5,
+      paddingVertical: 10,
+      paddingHorizontal: 20,
+      alignItems: 'center',
+      marginVertical:1,
+
+    },
+    buttonText : {
+      color : 'white',
+      fontSize:12
+    },
+    btnSubmit : {
+      marginTop:0,
+      position:'absolute',
+      bottom:0,
+      paddingVertical:15,
+      right:0,
+      left:0
+    }
 });
 
-export default UploadUMKM;
+export default UMKMRegistrationScreen;

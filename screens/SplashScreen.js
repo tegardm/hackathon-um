@@ -1,11 +1,27 @@
 import * as React from "react";
+import { useEffect } from "react";
+
 import { TouchableOpacity, StyleSheet, View, Text } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import { Color, FontSize, FontFamily } from "../GlobalStyles";
+import {firebase, auth, db} from "../firebase"
+import { onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
 
 const SplashScreen = () => {
   const navigation = useNavigation();
+
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, user => {
+      if(user){
+        console.log("Logged as:", user.email);
+        navigation.replace("Home")
+      }
+    })
+
+    return unsubscribe
+  }, [])
 
   const handlePress = () => {
     navigation.navigate('SignUp');

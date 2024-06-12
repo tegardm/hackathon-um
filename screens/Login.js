@@ -34,7 +34,9 @@ const Login = () => {
       signInWithEmailAndPassword(auth, email, password).then(userCredentials =>{
         const user = userCredentials.user;
         console.log("Logged in using:", user.email);
-      }).catch(error => setErrorMessage(error.message))
+        
+      }).catch(error => {
+        setErrorMessage(error.message)})
       
     }
   };
@@ -143,7 +145,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.textSRegular_size,
   },
   errorText: {
-    color: 'red',
+    color: 'white',
     marginTop: Padding.p_base,
     textAlign: "center",
   },

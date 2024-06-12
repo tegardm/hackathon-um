@@ -29,7 +29,7 @@ const BottomNavBar = () => {
   );
 };
 
-const CategoriesCard = () => {
+const CategoriesCard = ({text}) => {
   return (
     <View style={styles.eventCardContainer}>
       <View>
@@ -40,7 +40,7 @@ const CategoriesCard = () => {
         </ImageBackground>
       </View>
       <View>
-        <Text style={styles.eventTitle}>Category A</Text>
+        <Text style={styles.eventTitle}>{text}</Text>
         <Text style={styles.eventDesc}>ini adalah deskripsi yang akan 
           panjang tapi saya bingung panjang tapi saya bingung panjang tapi saya bingung</Text>
 
@@ -59,14 +59,13 @@ const Categories = () => {
       <ScrollView vertical showsVerticalScrollIndicator={false}>
 
       <View style={styles.eventContainer}>
-      <CategoriesCard/>
-      <CategoriesCard/>
-      <CategoriesCard/>
-      <CategoriesCard/>
-      <CategoriesCard/>
-      <CategoriesCard/>
-      <CategoriesCard/>
-      <CategoriesCard/>
+      <CategoriesCard text='Olahraga'/>
+      <CategoriesCard text='Wisuda'/>
+      <CategoriesCard text='Karnaval'/>
+      <CategoriesCard text='Kebudayaan'/>
+      <CategoriesCard text='Makanan'/>
+      <CategoriesCard text='Karya Seni'/>
+      <CategoriesCard text='Teknologi'/>
 
       </View>
       </ScrollView>
@@ -98,7 +97,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ac1484',
     padding: 6, // Padding horizontal untuk tombol
     position: 'absolute',
-    bottom: 41,
+    bottom: 38,
     left: 0,
     right: 0,
     width: '100%',
