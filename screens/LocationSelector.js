@@ -1,201 +1,149 @@
-import React from "react";
-import { Image } from "expo-image";
-import { StyleSheet, View, Text, Pressable, TextInput } from "react-native";
+import React, {useState} from "react";
+import { View, Text, Pressable, Image, StyleSheet, TextInput } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import { FontFamily, Color, FontSize, Padding, Border } from "../GlobalStyles";
-
+import MapView, { Marker } from 'react-native-maps';
+import { auth, db } from '../firebase';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
 const LocationSelector = () => {
   const navigation = useNavigation();
 
+  const [region, setRegion] = useState({
+    latitude: -6.200000,
+    longitude: 106.816666,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  });
+
+  const handleConfirm = async () => {
+    try {
+      const user = auth.currentUser;
+      if (user) {
+        const userRef = doc(db, 'users', user.uid);
+        await updateDoc(userRef, {
+          location: {
+            latitude: region.latitude,
+            longitude: region.longitude,
+          },
+        });
+        navigation.navigate('Home');
+      } else {
+        console.error('No authenticated user found');
+      }
+    } catch (error) {
+      console.error('Error updating location: ', error);
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <Image
-        style={styles.mapImage}
-        contentFit="cover"
-        source={require("../assets/mapcontainer.png")}
-      />
+      <MapView
+        style={styles.map}
+        region={region}
+        onRegionChangeComplete={setRegion}
+      >
+        <Marker coordinate={{ latitude: region.latitude, longitude: region.longitude }} />
+      </MapView>
       <View style={styles.selectorMenu}>
-        <View style={styles.selectorMenuBackground} />
-        <View style={styles.stateLayer}>
-          <Image
-            style={styles.layerIcon}
-            contentFit="cover"
-            source={require("../assets/layer-2.png")}
-          />
-          <View style={styles.content}>
-            <TextInput
-            style={styles.locationText}
-            placeholder="Lapangan Rampal, Malang"
-            />
-          </View>
-          <View style={styles.trailingElements}>
-            <View style={styles.trailingIcon}>
-              <View style={styles.iconContainer}>
-                <View style={styles.iconStateLayer}>
-                  <Image
-                    style={styles.iconImage}
-                    contentFit="cover"
-                    source={require("../assets/iconssearch-24px.png")}
-                  />
-                </View>
-              </View>
-            </View>
-            <View style={[styles.trailingIcon, styles.hidden]}>
-              <View style={styles.iconContainer}>
-                <View style={styles.iconStateLayer}>
-                  <Image
-                    style={styles.iconImage}
-                    contentFit="cover"
-                    source={require("../assets/iconsmore-vert-24px.png")}
-                  />
-                </View>
-              </View>
-            </View>
-          </View>
-        </View>
+        <Text style={styles.selectorTitle}>Pilih lokasi baru</Text>
+        
         <Pressable
           style={styles.confirmButton}
-          onPress={() => navigation.navigate("Home")}
+          onPress={handleConfirm}
         >
-          <Text style={styles.confirmButtonText}>Confirm location</Text>
+          <Text style={styles.confirmButtonText}>Simpan Lokasi</Text>
         </Pressable>
-        <Text style={styles.selectorTitle}>Select your location</Text>
       </View>
-      <Image
-        style={styles.locationPin}
-        contentFit="cover"
-        source={require("../assets/locationpin.png")}
-      />
+      
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    width: "100%",
-    height: 852,
-    overflow: "hidden",
+    flex: 1,
+    position: 'relative',
+  },
+  map: {
     flex: 1,
   },
-  mapImage: {
-    height: 859,
-    width: 393,
-    position: "absolute",
-    top: 0,
-    left: 0,
-  },
   selectorMenu: {
-    position: "absolute",
-    top: 580,
-    height: 232,
-    width: 393,
-    left: 0,
-  },
-  selectorMenuBackground: {
-    backgroundColor: Color.colorWhite1,
-    height: "110%",
-    width: "100%",
-    position: "absolute",
-    top: 0,
-
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    alignItems: 'center',
+    paddingBottom: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
   },
   stateLayer: {
-    position: "absolute",
-    top: 69,
-    left: 33,
-    height: 54,
-    width: 328,
-    borderRadius: Border.br_3xs,
-    backgroundColor: Color.colorWhitesmoke,
-    paddingHorizontal: Padding.p_xs,
+    width: '90%',
+    borderRadius: 10,
+    backgroundColor: '#f0f0f0',
+    paddingHorizontal: 10,
     paddingVertical: 4,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  layerIcon: {
-    width: 12,
-    height: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 10,
   },
   content: {
     flex: 1,
     marginLeft: 15,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   locationText: {
     letterSpacing: 1,
     lineHeight: 24,
-    fontFamily: FontFamily.textSRegular,
-    color: "#989ea7",
-    textAlign: "left",
-    fontSize: FontSize.size_smi,
-  },
-  trailingElements: {
-    justifyContent: "flex-end",
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  trailingIcon: {
-    height: 48,
-    width: 48,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  iconContainer: {
-    borderRadius: Border.br_81xl,
-    overflow: "hidden",
-  },
-  iconStateLayer: {
-    padding: Padding.p_5xs,
-  },
-  iconImage: {
-    width: 24,
-    height: 24,
-  },
-  hidden: {
-    display: "none",
+    fontFamily: 'Arial',
+    color: '#989ea7',
+    textAlign: 'left',
+    fontSize: 14,
+    flex: 1,
   },
   confirmButton: {
-    position: "absolute",
-    top: 148,
-    left: 33,
-    width: 328,
-    borderRadius: Border.br_7xs,
-    backgroundColor: Color.colorMediumvioletred_100,
-    paddingHorizontal: Padding.p_77xl,
-    paddingVertical: Padding.p_base,
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "row",
+    width: '90%',
+    borderRadius: 10,
+    backgroundColor: '#c71585',
+    paddingVertical: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
   },
   confirmButtonText: {
     lineHeight: 20,
-    color: Color.colorWhite1,
-    textAlign: "center",
-    fontSize: FontSize.size_smi,
-    fontFamily: FontFamily.poppinsBold,
-    fontWeight: "700",
+    color: '#ffffff',
+    textAlign: 'center',
+    fontSize: 14,
+    fontFamily: 'Arial-BoldMT',
+    fontWeight: '700',
   },
   selectorTitle: {
-    position: "absolute",
-    top: 15,
-    left: 37,
-    width: 256,
     fontSize: 24,
     lineHeight: 42,
-    color: Color.colorDarkslategray_100,
-    textAlign: "left",
-    fontFamily: FontFamily.poppinsBold,
-    fontWeight: "700",
+    color: '#2f4f4f',
+    textAlign: 'center',
+    fontFamily: 'Arial-BoldMT',
+    fontWeight: '700',
+    marginVertical: 10,
+  },
+  locationPinContainer: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginLeft: -15, // half of the pin width
+    marginTop: -30, // half of the pin height
+    width: 30,
+    height: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   locationPin: {
-    position: "absolute",
-    top: 251,
-    left: 209,
-    width: 67,
-    height: 67,
+    width: 30,
+    height: 30,
+    backgroundColor: 'red',
+    borderRadius: 15,
   },
 });
 

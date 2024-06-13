@@ -39,10 +39,15 @@ const NavTop = ({username}) => {
   return (
     <View style={styles.navTop}>
       <View>
+      <Pressable onPress={() => navigation.navigate("LocationSelector")}>
         <Text style={styles.cityNav}>
-          <Image style={{margin:5}} source={require('../assets/layer-2.png')} />
-          <Text style={{fontSize:15, marginLeft:5,color:'gray'}}> Nama Kota</Text>
+          
+            <Image style={{margin:5}} source={require('../assets/layer-2.png')} />
+            <Text style={{fontSize:15, marginLeft:5,color:'gray'}}> Nama Kota</Text>
+          
+          
         </Text>
+        </Pressable>
         <Text style={styles.usernameNav}>{username ? username : 'Loading...'}</Text>
       </View>
       <View style={styles.navInfo}>

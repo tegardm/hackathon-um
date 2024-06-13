@@ -1,12 +1,15 @@
 import * as React from "react";
 import { useEffect } from "react";
 import {useState} from 'react';
-import { StyleSheet, View, Text, Pressable, TextInput } from "react-native";
+import { StyleSheet, View, Text, Pressable, TextInput, ScrollView } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import {firebase, auth, db} from "../firebase"
 import { createUserWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
+import MapView, { Marker } from 'react-native-maps';
+
+
 const SignUpForm = () => {
   const navigation = useNavigation()
   const [username, setUsername] = useState('')
@@ -14,6 +17,12 @@ const SignUpForm = () => {
   const [password, setPassword] = useState('')
   const [passwordRp, setPasswordRp] = useState('')
   const [domisili, setDomisili] = useState('')
+  const [region, setRegion] = useState({
+    latitude: -6.200000,
+    longitude: 106.816666,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  });
   const [errorMessage, setErrorMessage] = useState('')
 
   useEffect(() => {
@@ -62,7 +71,11 @@ const SignUpForm = () => {
       await setDoc(doc(db, 'users', user.uid), {
         Username: username,
         Email: email,
-        Domisili: domisili
+        Domisili: domisili,
+        location: {
+          latitude: region.latitude,
+          longitude: region.longitude,
+        },
       });
   
       console.log('User signed up and username saved');
@@ -79,7 +92,8 @@ const SignUpForm = () => {
 
   
   return (
-    <View style={styles.signupForm}>
+    <ScrollView>
+    <View  style={styles.signupForm}>
       <LinearGradient
         style={styles.background}
         locations={[0, 1]}
@@ -117,6 +131,20 @@ const SignUpForm = () => {
           onChangeText={text => setDomisili(text)}
         />
       </View>
+
+      <View style={[styles.inputField, styles.inputContainer]}>
+        <Text style={styles.label}>Pilih Lokasi</Text>
+      <MapView
+        style={styles.map}
+        region={region}
+        onRegionChangeComplete={setRegion}
+      >
+        <Marker coordinate={{ latitude: region.latitude, longitude: region.longitude }} />
+      </MapView>
+      </View>
+
+      
+
       <View style={[styles.inputField, styles.inputContainer]}>
         <Text style={styles.label}>Password</Text>
         <TextInput
@@ -153,7 +181,10 @@ const SignUpForm = () => {
           <Text style={styles.signInLink}>Sign in</Text>
         </Text>
       </Pressable>
+    
+
     </View>
+    </ScrollView>
   );
 };
 
@@ -237,6 +268,11 @@ const styles = StyleSheet.create({
   signInLink: {
     color: "#9c20a0",
     fontWeight: "bold",
+  },
+  map: {
+    width: '100%',
+    height: 200,
+    marginTop: 10,
   },
 });
 
