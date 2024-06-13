@@ -96,6 +96,7 @@ const styles = StyleSheet.create({
   locationText: {
     letterSpacing: 1,
     lineHeight: 24,
+    fontFamily: 'Arial',
     color: '#989ea7',
     textAlign: 'left',
     fontSize: 14,
@@ -115,6 +116,7 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     textAlign: 'center',
     fontSize: 14,
+    fontFamily: 'Arial-BoldMT',
     fontWeight: '700',
   },
   selectorTitle: {
@@ -122,6 +124,7 @@ const styles = StyleSheet.create({
     lineHeight: 42,
     color: '#2f4f4f',
     textAlign: 'center',
+    fontFamily: 'Arial-BoldMT',
     fontWeight: '700',
     marginVertical: 10,
   },

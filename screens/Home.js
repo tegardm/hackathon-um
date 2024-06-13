@@ -33,7 +33,7 @@ const SearchBar = ({ placeholder, onSearch }) => {
 
 
 
-const NavTop = ({username,domisili}) => {
+const NavTop = ({username}) => {
   const navigation = useNavigation();
 
   return (
@@ -43,7 +43,7 @@ const NavTop = ({username,domisili}) => {
         <Text style={styles.cityNav}>
           
             <Image style={{margin:5}} source={require('../assets/layer-2.png')} />
-            <Text style={{fontSize:15, marginLeft:5,color:'gray'}}> {domisili ? domisili : 'Loading...'}</Text>
+            <Text style={{fontSize:15, marginLeft:5,color:'gray'}}> Nama Kota</Text>
           
           
         </Text>
@@ -87,11 +87,8 @@ const Category = ({text}) => {
 }
 
 const EventCard = () => {
-  const navigation = useNavigation();
-
   return (
-    <Pressable onPress={() => navigation.navigate('DetailEvent')}>
-      <View style={styles.eventCardContainer}>
+    <View style={styles.eventCardContainer}>
       <View>
         <ImageBackground
           source={require('../assets/background.png')}
@@ -112,7 +109,6 @@ const EventCard = () => {
         </View>
       </View>
     </View>
-    </Pressable>
   )
 }
 
@@ -198,7 +194,7 @@ const Home = () => {
   return (
     <View>
     <ScrollView   style={styles.container}>
-      <NavTop domisili={userData?.Domisili ?? 'Loading...'} username={userData?.Username ?? 'Loading...'} />
+      <NavTop username={userData?.Username ?? 'Loading...'} />
       <SearchBar placeholder="Search..." onSearch={handleSearch} />
       <View style={styles.categories}>
         <View style={{flexDirection:'row',alignItems:'center', justifyContent:'space-between'}}>
