@@ -1,13 +1,19 @@
 import React, { useState } from 'react';
 import { Image, View, Text, Linking,Button, StyleSheet, ScrollView, TextInput,ImageBackground, TouchableOpacity, Pressable } from 'react-native'; // Import TextInput
 import { useNavigation } from "@react-navigation/native";
+import MapView, { Marker } from 'react-native-maps';
 
 const UMKMRegistrationScreen = () => {
   const [isChecked, setIsChecked] = useState(false);
   const navigation = useNavigation()
   const [umkmName, setUmkmName] = useState('');
   const [umkmLink, setUmkmLink] = useState('');
-
+  const [region, setRegion] = useState({
+    latitude: -6.200000,
+    longitude: 106.816666,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  });
   const [umkmDescription, setUmkmDescription] = useState('');
   return (
     <View style={styles.container}>
@@ -50,6 +56,17 @@ const UMKMRegistrationScreen = () => {
         value={umkmLink}
         onChangeText={setUmkmLink}
       />
+
+<Text style={styles.label}>Pilih Lokasi</Text>
+        <View style={styles.mapContainer}>
+          <MapView
+            style={styles.map}
+            region={region}
+            onRegionChangeComplete={setRegion}
+          >
+            <Marker coordinate={{ latitude: region.latitude, longitude: region.longitude }} />
+          </MapView>
+        </View>
 
       <Text style={styles.label}>Upload Berkas Identitas (PDF)</Text>
       
@@ -192,7 +209,17 @@ const styles = StyleSheet.create({
       paddingVertical:15,
       right:0,
       left:0
-    }
+    },
+    mapContainer: {
+      borderColor: '#ac1484',
+      borderWidth: 1,
+      marginTop: 15,
+      borderRadius: 5,
+      overflow: 'hidden', // Ensure the map stays within the border radius
+    },
+    map: {
+      height: 200, // Adjust the height as needed
+    },
 });
 
 export default UMKMRegistrationScreen;

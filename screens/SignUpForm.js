@@ -1,183 +1,151 @@
-import * as React from "react";
-import { useEffect } from "react";
-import {useState} from 'react';
-import { StyleSheet, View, Text, Pressable, TextInput } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import { useNavigation } from "@react-navigation/native";
-import {firebase, auth, db} from "../firebase"
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, Text, Pressable, TextInput, ScrollView } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useNavigation } from '@react-navigation/native';
+import { firebase, auth, db } from '../firebase';
 import { createUserWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
+import MapView, { Marker } from 'react-native-maps';
+
 const SignUpForm = () => {
-  const navigation = useNavigation()
-  const [username, setUsername] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [passwordRp, setPasswordRp] = useState('')
-  const [domisili, setDomisili] = useState('')
-  const [errorMessage, setErrorMessage] = useState('')
+  const navigation = useNavigation();
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [passwordRp, setPasswordRp] = useState('');
+  const [domisili, setDomisili] = useState('');
+  const [region, setRegion] = useState({
+    latitude: -6.200000,
+    longitude: 106.816666,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  });
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, user => {
-      if(user){
-        console.log("Logged as:", user.email);
-        navigation.replace("Home")
+      if (user) {
+        console.log('Logged as:', user.email);
+        navigation.replace('Home');
       }
-    })
+    });
 
-    return unsubscribe
-  }, [])
-
-
-  const handleUsernameChange = (e) => {
-    const username = e.nativeEvent.text;
-    setUsername(username);
-  };
-
-  const handleEmailChange = (e) => {
-    const email = e.nativeEvent.text;
-    setEmail(email);
-  };
-
-  const handleDomisiliChange = (e) => {
-    const domisili = e.nativeEvent.text;
-    setDomisili(domisili);
-  };
+    return unsubscribe;
+  }, []);
 
   const handleSignup = () => {
-    if(password === ""){
-      console.log("password harus sama");
-      console.log("data log:", password, email);
-    }else{
-      signUp(email, password, username, domisili);
+    if (password !== passwordRp) {
+      setErrorMessage('Passwords do not match');
+      return;
     }
-  }
+
+    signUp(email, password, username, domisili);
+  };
 
   const signUp = async (email, password, username, domisili) => {
     try {
-      // Create user with email and password
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
       console.log(user.email);
-      // Save the username in Firestore
+
       await setDoc(doc(db, 'users', user.uid), {
         Username: username,
         Email: email,
-        Domisili: domisili
+        Domisili: domisili,
+        location: {
+          latitude: region.latitude,
+          longitude: region.longitude,
+        },
       });
-  
+
       console.log('User signed up and username saved');
     } catch (error) {
+      setErrorMessage(error.message);
       console.error('Error signing up:', error);
-    console.error("Error message:", error.message);
-    console.error("Error code:", error.code);
-    console.error("Error details:", error.details);
-    console.error("Native error code:", error.nativeErrorCode);
-    console.error("Native error message:", error.nativeErrorMessage);
     }
   };
 
-
-  
   return (
-    <View style={styles.signupForm}>
+    <ScrollView contentContainerStyle={styles.scrollViewContent}>
       <LinearGradient
         style={styles.background}
         locations={[0, 1]}
-        colors={["rgba(32, 41, 51, 0.32)", "#202933"]}
+        colors={['rgba(32, 41, 51, 0.32)', '#202933']}
       />
       <LinearGradient
         style={[styles.background, styles.overlay]}
         locations={[0, 1]}
-        colors={["#9c20a0", "#191a1b"]}
+        colors={['#9c20a0', '#191a1b']}
       />
 
-      <Text style={styles.title}>Daftar Untuk Lanjut</Text>
+      <View style={styles.signupForm}>
+        <Text style={styles.title}>EventaStand Registrasi</Text>
 
-      <View style={[styles.inputField, styles.inputContainer]}>
-        <Text style={styles.label}>Username</Text>
-        <TextInput
-          style={styles.input}
-          value={username}
-          onChange={handleUsernameChange}
-        />
-      </View>
-      <View style={[styles.inputField, styles.inputContainer]}>
-        <Text style={styles.label}>Alamat Email</Text>
-        <TextInput
-          style={styles.input}
-          value={email}
-          onChangeText={text => setEmail(text)}
-        />
-      </View>
-      <View style={[styles.inputField, styles.inputContainer]}>
-        <Text style={styles.label}>Kota Domisili</Text>
-        <TextInput
-          style={styles.input}
-          value={domisili}
-          onChangeText={text => setDomisili(text)}
-        />
-      </View>
-      <View style={[styles.inputField, styles.inputContainer]}>
-        <Text style={styles.label}>Password</Text>
-        <TextInput
-          style={styles.input}
-          value={password}
-          onChangeText={text => setPassword(text)}
-          secureTextEntry
-        />
-      </View>
-      <View style={[styles.inputField, styles.inputContainer]}>
-        <Text style={styles.label}>Repeat Password</Text>
-        <TextInput
-          style={styles.input}
+        <InputField label="Username" value={username} onChangeText={setUsername} />
+        <InputField label="Alamat Email" value={email} onChangeText={setEmail} />
+        <InputField label="Kota Domisili" value={domisili} onChangeText={setDomisili} />
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Pilih Lokasi</Text>
+          <MapView
+            style={styles.map}
+            region={region}
+            onRegionChangeComplete={setRegion}
+          >
+            <Marker coordinate={{ latitude: region.latitude, longitude: region.longitude }} />
+          </MapView>
+        </View>
+
+        <InputField label="Password" value={password} onChangeText={setPassword} secureTextEntry />
+        <InputField
+          label="Repeat Password"
           value={passwordRp}
-          onChangeText={text => setPasswordRp(text)}
+          onChangeText={setPasswordRp}
           secureTextEntry
         />
-      </View>
-      
 
-      <Pressable
-        style={styles.createButton}
-        onPress={handleSignup}
-      >
-      <Text style={styles.createButtonText}>Create account</Text>
-      </Pressable>
-      
-      <Pressable
-        style={styles.signInContainer}
-        onPress={() => navigation.navigate("Login")}
-      >
-        <Text style={styles.signInText}>
-          <Text style={styles.signInPrompt}>You have an account? </Text>
-          <Text style={styles.signInLink}>Sign in</Text>
-        </Text>
-      </Pressable>
-    </View>
+        {errorMessage ? <Text style={styles.errorMessage}>{errorMessage}</Text> : null}
+
+        <Pressable style={styles.createButton} onPress={handleSignup}>
+          <Text style={styles.createButtonText}>Create account</Text>
+        </Pressable>
+
+        <Pressable style={styles.signInContainer} onPress={() => navigation.navigate('Login')}>
+          <Text style={styles.signInText}>
+            <Text style={styles.signInPrompt}>You have an account? </Text>
+            <Text style={styles.signInLink}>Sign in</Text>
+          </Text>
+        </Pressable>
+      </View>
+    </ScrollView>
   );
 };
 
-const InputField = ({ label, value, onChangeText, containerStyle, secureTextEntry }) => (
-  <View style={[styles.inputField, containerStyle]}>
+const InputField = ({ label, value, onChangeText, secureTextEntry }) => (
+  <View style={styles.inputContainer}>
     <Text style={styles.label}>{label}</Text>
     <TextInput
       style={styles.input}
-      defaultValue={value}
       value={value}
-      onChange={onChangeText}
+      onChangeText={onChangeText}
       secureTextEntry={secureTextEntry}
     />
   </View>
 );
 
-
-
 const styles = StyleSheet.create({
+  scrollViewContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
   signupForm: {
-    flex: 1,
-    backgroundColor: "#202936",
-    justifyContent: "center",
-    alignItems: "center",
+    width: '100%',
+    alignItems: 'center',
+    backgroundColor: '#202936',
+    padding: 20,
+    borderRadius: 10,
   },
   background: {
     ...StyleSheet.absoluteFillObject,
@@ -186,57 +154,66 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   title: {
-    fontSize: 30,
-    color: "#FFFFFF",
-    textAlign: "center",
+    fontSize: 20,
+    color: '#FFFFFF',
+    textAlign: 'center',
     marginBottom: 30,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   inputContainer: {
+    width: '100%',
     marginBottom: 20,
   },
-  inputField: {
-    width: 328,
-    backgroundColor: "#2C3E50",
-    borderRadius: 5,
-    padding: 15,
-  },
   label: {
-    color: "#A0A0A0",
+    color: '#A0A0A0',
     fontSize: 14,
     marginBottom: 5,
   },
   input: {
-    color: "#FFFFFF",
+    width: '100%',
+    backgroundColor: '#2C3E50',
+    color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: 'bold',
+    borderRadius: 5,
+    padding: 15,
+  },
+  map: {
+    width: '100%',
+    height: 200,
+    marginTop: 10,
+    borderRadius: 5,
   },
   createButton: {
-    backgroundColor: "#9c20a0",
+    backgroundColor: '#9c20a0',
     borderRadius: 5,
     paddingVertical: 15,
     paddingHorizontal: 100,
-    alignItems: "center",
+    alignItems: 'center',
     marginBottom: 20,
   },
   createButtonText: {
-    color: "#FFFFFF",
+    color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   signInContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   signInText: {
-    color: "#FFFFFF",
+    color: '#FFFFFF',
   },
   signInPrompt: {
-    color: "#FFFFFF",
+    color: '#FFFFFF',
   },
   signInLink: {
-    color: "#9c20a0",
-    fontWeight: "bold",
+    color: '#9c20a0',
+    fontWeight: 'bold',
+  },
+  errorMessage: {
+    color: 'red',
+    marginBottom: 10,
   },
 });
 
