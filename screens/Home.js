@@ -4,6 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import Icon from 'react-native-vector-icons/FontAwesome'; // Import the icon library
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '../firebase';
+import categoryData from '../assets/data/categories.json'
 
 // Define the SearchBar component
 const SearchBar = ({ placeholder, onSearch }) => {
@@ -61,16 +62,22 @@ const NavTop = ({username}) => {
   );
 };
 
-const Category = () => {
+const Category = ({text}) => {
+
+
+  const navigation = useNavigation();
+
   return (
-    <View style={styles.containerCategory}>
+    <Pressable onPress={() => navigation.navigate('Saved',{text:text})}>
+      <View style={styles.containerCategory}>
       <ImageBackground
         source={require('../assets/background.png')}
         style={styles.boxCategory}
         imageStyle={{ borderRadius: 20 }}>
-        <Text style={styles.textCategory}>Olaahraga</Text>
+        <Text style={styles.textCategory}>{text}</Text>
       </ImageBackground>
     </View>
+    </Pressable>
   );
 }
 
@@ -126,10 +133,14 @@ const BottomNavBar = () => {
 };
 
 const Home = () => {
+  const [categories,setCategories] = useState()
+
 
   const [username,setUsername] = useState()
 
   useEffect(() => {
+    setCategories(categoryData)
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         // Ambil username dari objek pengguna Firebase
@@ -138,6 +149,7 @@ const Home = () => {
     });
 
     return unsubscribe;
+    
   }, []);
 
   const navigation = useNavigation();
@@ -162,13 +174,8 @@ const Home = () => {
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View style={styles.categoriesItems}>
-          <Category/>
-          <Category/>
-          <Category/>
-          <Category/>
-
-          <Category/>
-          <Category/>
+             <Category text='asa' />
+         
           {/* Tambahkan kategori tambahan di sini */}
         </View>
       </ScrollView>
@@ -290,7 +297,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   textCategory: {
-    fontSize: 15,
+    fontSize: 14,
+    width:'90%',
+    margin:'auto',
+    textAlign:'center',
     fontWeight: 'bold',
     color: 'white', // Ganti dengan warna teks yang sesuai
   },

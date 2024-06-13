@@ -40,14 +40,16 @@ const EventCard = ({title}) => {
         </ImageBackground>
       </View>
       <View>
-        <Text style={styles.eventTitle}>{title ? `Acara ${title}` : 'Title Event'}</Text>
-        <Text style={styles.eventDesc}>ini adalah deskripsi dalah deskripsi ya yang akan panjang tapi saya bingung</Text>
+        <Text style={styles.eventTitle}>{title ? `UMKM ${title}` : 'Nama UMKM'}</Text>
+        <Text style={styles.eventDesc}>
+            Ini berisikan deskripsi dari UMKM yang dituliskan oleh pelaku UMKM yang sudah terverifikasi
+            oleh tim administrator EventaStand 
+            </Text>
 
-        <Text style={styles.eventCity}>
-        <Icon name="location-arrow" size={12} color="gray" style={styles.searchIcon} /> Malang</Text>
+        
         <View style={styles.dateDistance}>
-          <Text style={styles.eventDate}>
-            <Icon padding={15} name="clock-o" size={12} color="gray" style={styles.searchIcon} /> 14 June</Text>
+        <Text style={styles.eventDate}>
+        <Icon name="location-arrow" size={12} color="gray" style={styles.searchIcon} /> Malang</Text>
           <Text style={styles.eventDistance}>2.4 Km</Text>
         </View>
       </View>
@@ -80,8 +82,8 @@ const BottomNavBar = () => {
   );
 };
 
-const Saved = () => {
-  const route = useRoute();
+const NearbyUMKM = () => {
+    const route = useRoute();
   const { text = '' } = route.params || {}; // Nilai default jika route.params atau text undefined
 
   const navigation = useNavigation();
@@ -89,35 +91,38 @@ const Saved = () => {
 
   const handleSearch = (value) => {
     setSearchText(value);
-    // Lakukan sesuatu dengan search text, misalnya filter data
+    // Do something with the search text, for example, filter data
   };
-
   return (
     <View>
       <View style={styles.container}>
         <View style={styles.acaraContainer}>
-          <Pressable><Text style={styles.acaraTitle}>Acara Sekitar</Text></Pressable>
-          <Pressable onPress={() => navigation.navigate('NearbyUMKM', {text : text})}>
-            <Text style={[styles.acaraTitle, { color: 'gray', borderColor: 'lightgray', fontWeight: 'normal' }]}>UMKM Sekitar</Text>
-          </Pressable>
+          
+        <Pressable onPress={() => navigation.navigate('Saved')}><Text style={[styles.acaraTitle, 
+          {color:'gray',borderColor:'lightgray',fontWeight:'normal'}]}>Acara Sekitar</Text></Pressable>
+        <Pressable><Text style={styles.acaraTitle}>UMKM Sekitar</Text></Pressable>
+
         </View>
         <SearchBar placeholder="Search..." onSearch={handleSearch} />
-        <View>
-          <Text style={styles.acaraRibbon}>{text ? `Acara Dengan Kategori ${text}` : 'Acara sekitar Anda'}</Text>
+        <View >
+        <Text style={styles.acaraRibbon}>{text ? `UMKM Dengan Kategori ${text}` : 'UMKM sekitar Anda'}</Text>
         </View>
         <ScrollView vertical showsVerticalScrollIndicator={false}>
-          <View style={styles.eventContainer}>
-            <EventCard title={text} />
-            <EventCard title={text} />
-            <EventCard title={text} />
-            <EventCard title={text} />
-            <EventCard title={text} />
-            <EventCard title={text} />
+        <View style={styles.eventContainer}>
+          <EventCard title={text}/>
+          <EventCard title={text}/>
+          <EventCard title={text}/>
+          <EventCard title={text}/>
+          <EventCard title={text}/>
+          <EventCard title={text}/>
+
           </View>
-        </ScrollView>
+          </ScrollView>
+
       </View>
-      <BottomNavBar />
+                <BottomNavBar/>
     </View>
+
   );
 };
 
@@ -246,4 +251,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Saved;
+export default NearbyUMKM;

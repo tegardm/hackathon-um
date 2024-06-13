@@ -1,9 +1,9 @@
-import * as React from "react";
+import React, { useEffect, useState } from 'react';
 import { Image, View, Text, StyleSheet, ScrollView, TextInput,ImageBackground, TouchableOpacity, Pressable } from 'react-native'; // Import TextInput
 import { useNavigation } from "@react-navigation/native";
 import { Color, FontSize, FontFamily, Border } from "../GlobalStyles";
 import Icon from 'react-native-vector-icons/FontAwesome'; // Import the icon library
-
+import categoryData from '../assets/data/categories.json'
 const BottomNavBar = () => {
   const navigation = useNavigation();
 
@@ -30,8 +30,11 @@ const BottomNavBar = () => {
 };
 
 const CategoriesCard = ({text}) => {
+  const navigation = useNavigation();
+
   return (
-    <View style={styles.eventCardContainer}>
+    <Pressable onPress={() => navigation.navigate('Saved',{text : text})}>
+      <View style={styles.eventCardContainer}>
       <View>
         <ImageBackground
           source={require('../assets/background.png')}
@@ -47,9 +50,17 @@ const CategoriesCard = ({text}) => {
         
       </View>
     </View>
+    </Pressable>
   )
 }
 const Categories = () => {
+
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    setCategories(categoryData);
+  },[]);
+
   const navigation = useNavigation();
 
   return (
@@ -59,13 +70,17 @@ const Categories = () => {
       <ScrollView vertical showsVerticalScrollIndicator={false}>
 
       <View style={styles.eventContainer}>
-      <CategoriesCard text='Olahraga'/>
+      {categories.map((category,index) => (<CategoriesCard key={index} text={category.title}/>)
+            
+      )}
+
+      {/* <CategoriesCard text='Olahraga'/>
       <CategoriesCard text='Wisuda'/>
       <CategoriesCard text='Karnaval'/>
       <CategoriesCard text='Kebudayaan'/>
       <CategoriesCard text='Makanan'/>
       <CategoriesCard text='Karya Seni'/>
-      <CategoriesCard text='Teknologi'/>
+      <CategoriesCard text='Teknologi'/> */}
 
       </View>
       </ScrollView>

@@ -20,6 +20,8 @@ import UploadUMKM from "./screens/UploadUMKM";
 import UploadReview from "./screens/UploadReview";
 import DetailEvent from "./screens/DetailEvent";
 import AprovedEvent from "./screens/AprovedEvent";
+import NearbyUMKM from "./screens/NearbyUMKM";
+
 
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { View, Text, Pressable, TouchableOpacity } from "react-native";
@@ -87,6 +89,11 @@ const App = () => {
             <Stack.Screen
               name="CreateEvent"
               component={CreateEvent}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="NearbyUMKM"
+              component={NearbyUMKM}
               options={{ headerShown: false }}
             />
             <Stack.Screen
