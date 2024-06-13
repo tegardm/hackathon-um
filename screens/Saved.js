@@ -30,8 +30,10 @@ const SearchBar = ({ placeholder, onSearch }) => {
 
 
 const EventCard = ({title}) => {
+  const navigation = useNavigation()
   return (
-    <View style={styles.eventCardContainer}>
+    <Pressable onPress={() => navigation.navigate('DetailEvent')}>
+      <View style={styles.eventCardContainer}>
       <View>
         <ImageBackground
           source={require('../assets/background.png')}
@@ -52,6 +54,7 @@ const EventCard = ({title}) => {
         </View>
       </View>
     </View>
+    </Pressable>
   )
 }
 
