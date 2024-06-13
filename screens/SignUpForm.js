@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, Pressable, TextInput, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
-import { firebase, auth, db } from '../firebase';
 import { createUserWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
+import { firebase, auth, db } from '../firebase';
 import { doc, setDoc } from 'firebase/firestore';
 import MapView, { Marker } from 'react-native-maps';
 

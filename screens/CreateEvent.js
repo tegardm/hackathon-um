@@ -1,12 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Image, Pressable, Linking } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import MultiSelect from 'react-native-multiple-select';
-import categoryData from '../assets/data/categories.json';
+import React, { useEffect, useState } from 'react';
+import { Image, Button, View, Text, StyleSheet, Linking, ScrollView, TextInput, ImageBackground, TouchableOpacity, Pressable } from 'react-native';
+import { useNavigation } from "@react-navigation/native";
+import RNPickerSelect from 'react-native-picker-select';
 import MapView, { Marker } from 'react-native-maps';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { auth, db } from '../firebase';
+import { doc,addDoc, getDoc, collection } from 'firebase/firestore';;
+import categoriesData from '../assets/data/categories.json'
 
-const CreateEvent = () => {
+
+
+const CreateEvent = () => { 
+
+  
+
   const navigation = useNavigation();
   const [region, setRegion] = useState({
     latitude: -6.200000,
@@ -14,6 +21,7 @@ const CreateEvent = () => {
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   });
+  const [user,setUser] = useState([])
   const [eventName, setEventName] = useState('');
   const [eventDescription, setEventDescription] = useState('');
   const [category, setCategory] = useState('');
@@ -32,17 +40,50 @@ const CreateEvent = () => {
   const [thumbnail, setThumbnail] = useState(null);
   const [proposal, setProposal] = useState(null);
   const [isChecked, setIsChecked] = useState(false);
-  const [selectedCategories, setSelectedCategories] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const [categories,setCategories] = useState([])
+  const [username,setUsername] = useState('')
+  const [userId,setUserId] = useState('')
 
   useEffect(() => {
-    const data = categoryData.map((category, index) => ({
-      id: index,
-      label: category.title,
-      value: category.title,
-    }));
-    setCategories(data);
-  }, []);
+    
+    const data = []
+    categoriesData.map((category) => {
+      data.push({label:category.title,value:category.title})
+    })
+
+    setCategories(data)
+
+    const fetchUserData = async () => {
+      try {
+        const user = auth.currentUser;
+        // console.log('Current user:', user);
+        if (user) {
+          const userDocRef = doc(db, 'users', user.uid);
+          const userDoc = await getDoc(userDocRef);
+          console.log(user);
+          if (userDoc.exists()) {
+            setUser(userDoc.data());
+            console.log(userDoc.data());
+            setUsername(userDoc.data()["Username"])
+            setUserId(user["uid"])
+            console.log(username);
+            console.log(userId);
+
+          
+            
+            // console.log(userData.Username);
+          } else {
+          }
+        } else {
+        }
+      } catch (error) {
+        // console.error('Error fetching user data: ', error);
+      }
+    };
+
+    fetchUserData();
+
+  },[])
 
   const handleImagePick = () => {
     // Handle image picking logic here
@@ -51,6 +92,34 @@ const CreateEvent = () => {
   const handleFilePick = () => {
     // Handle file picking logic here
   };
+
+  const handleSubmit = async () => {
+
+    
+
+    const newEvent = {
+      UserId : userId,
+      Username : username,
+      EventName : eventName,
+      EventDescription : eventDescription,
+      Categories : [category, 'Test','Test'],
+      EventDateStart : eventDateStart,
+      EventDateEnd : eventDateEnd,
+      Location : location,
+      Link : link,
+      StartTime : startTime,
+      EndTime : endTime,
+      RegistrationEnd : registrationEnd,
+      IsChecked : isChecked,
+
+    }
+
+    const docRef = await addDoc(collection(db, 'events'), newEvent);
+
+    // console.log('Document written with ID:', docRef.id);
+    navigation.navigate('UploadReview');
+    // console.log(newEvent);
+  }
 
   const showDatePicker = (type) => {
     setShowEventDatePickerStart(type === 'eventDateStart');
@@ -62,8 +131,8 @@ const CreateEvent = () => {
 
   const handleDateChange = (type, event, selectedDate) => {
     const currentDate = selectedDate || new Date();
-    showDatePicker(null); // close all pickers
-    switch (type) {
+    showDatePicker(null);  // close all pickers
+    switch(type) {
       case 'eventDateStart':
         setEventDateStart(currentDate);
         break;
@@ -84,89 +153,73 @@ const CreateEvent = () => {
 
   return (
     <View style={styles.container}>
-      <ScrollView style={{ marginBottom: 20 }} vertical showsVerticalScrollIndicator={false}>
+      <ScrollView style={{marginBottom:20}} vertical showsVerticalScrollIndicator={false}>
         <View style={styles.titleContainer}>
           <Pressable onPress={() => navigation.navigate('Home')}>
-            <Image source={require('../assets/vector-7.png')} />
+            <Image source={require('../assets/vector-7.png')}/>
           </Pressable>
           <Text style={styles.notifTitle}>Buat Postingan Acara / Event</Text>
         </View>
-
+        
         <Text style={styles.label}>Nama Event</Text>
         <TextInput
-          style={styles.input}
-          placeholder="NamaEvent"
-          value={eventName}
-          onChangeText={setEventName}
-        />
+          style={styles.input}     
+placeholder="NamaEvent"
+value={eventName}
+onChangeText={setEventName}
+/>
+<Text style={styles.label}>Deskripsi Event</Text>
+    <TextInput
+      style={styles.textArea}
+      placeholder="Deskripsi Event"
+      value={eventDescription}
+      onChangeText={setEventDescription}
+      multiline
+    />
+    <View style={{borderColor: '#ac1484', borderWidth: 1, marginTop:15, padding:10, borderRadius:5}}>
+      <Text style={styles.label}>Kategori</Text>
+      <RNPickerSelect 
+        onValueChange={value => setCategory(value)}
+        items={categories}
+      />
+    </View>
 
-        <Text style={styles.label}>Deskripsi Event</Text>
-        <TextInput
-          style={styles.textArea}
-          placeholder="Deskripsi Event"
-          value={eventDescription}
-          onChangeText={setEventDescription}
-          multiline
-        />
+    <Text style={styles.label}>Tanggal Awal</Text>
+    <TouchableOpacity onPress={() => showDatePicker('eventDateStart')} style={styles.dateButton}>
+      <Text style={styles.dateText}>{eventDateStart.toDateString()}</Text>
+    </TouchableOpacity>
+    {showEventDatePickerStart && (
+      <DateTimePicker
+        value={eventDateStart}
+        mode="date"
+        display="default"
+        onChange={(event, date) => handleDateChange('eventDateStart', event, date)}
+      />
+    )}
 
-        <View style={styles.categoryContainer}>
-          <Text style={styles.label}>Kategori</Text>
-          <MultiSelect
-            items={categories}
-            uniqueKey="id"
-            onSelectedItemsChange={setSelectedCategories}
-            selectedItems={selectedCategories}
-            selectText="Pilih Kategori"
-            searchInputPlaceholderText="Cari Kategori..."
-            onChangeInput={(text) => console.log(text)}
-            displayKey="label"
-            submitButtonText="Submit"
-            tagRemoveIconColor="#CCC"
-            tagBorderColor="#CCC"
-            tagTextColor="#CCC"
-            selectedItemTextColor="#CCC"
-            selectedItemIconColor="#CCC"
-            itemTextColor="#000"
-            searchInputStyle={{ color: '#CCC' }}
-            submitButtonColor="#CCC"
-          />
-        </View>
+    <Text style={styles.label}>Tanggal Akhir</Text>
+    <TouchableOpacity onPress={() => showDatePicker('eventDateEnd')} style={styles.dateButton}>
+      <Text style={styles.dateText}>{eventDateEnd.toDateString()}</Text>
+    </TouchableOpacity>
+    {showEventDatePickerEnd && (
+      <DateTimePicker
+        value={eventDateEnd}
+        mode="date"
+        display="default"
+        onChange={(event, date) => handleDateChange('eventDateEnd', event, date)}
+      />
+    )}
 
-        <Text style={styles.label}>Tanggal Awal</Text>
-        <TouchableOpacity onPress={() => showDatePicker('eventDateStart')} style={styles.dateButton}>
-          <Text style={styles.dateText}>{eventDateStart.toDateString()}</Text>
-        </TouchableOpacity>
-        {showEventDatePickerStart && (
-          <DateTimePicker
-            value={eventDateStart}
-            mode="date"
-            display="default"
-            onChange={(event, date) => handleDateChange('eventDateStart', event, date)}
-          />
-        )}
+    <Text style={styles.label}>Lokasi</Text>
+    <TextInput
+      style={styles.input}
+      placeholder="Lokasi"
+      value={location}
+      onChangeText={setLocation}
+    />
 
-        <Text style={styles.label}>Tanggal Akhir</Text>
-        <TouchableOpacity onPress={() => showDatePicker('eventDateEnd')} style={styles.dateButton}>
-          <Text style={styles.dateText}>{eventDateEnd.toDateString()}</Text>
-        </TouchableOpacity>
-        {showEventDatePickerEnd && (
-          <DateTimePicker
-            value={eventDateEnd}
-            mode="date"
-            display="default"
-            onChange={(event, date) => handleDateChange('eventDateEnd', event, date)}
-          />
-        )}
-
-        <Text style={styles.label}>Alamat Lokasi</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Lokasi"
-          value={location}
-          onChangeText={setLocation}
-        />
-          <Text style={styles.label}>Pilih Lokasi</Text>
-        <View style={styles.mapContainer}>
+      <Text style={styles.label}>Pilih Lokasi</Text>
+        {/* <View style={styles.mapContainer}>
           <MapView
             style={styles.map}
             region={region}
@@ -174,198 +227,97 @@ const CreateEvent = () => {
           >
             <Marker coordinate={{ latitude: region.latitude, longitude: region.longitude }} />
           </MapView>
-        </View>
+        </View> */}
 
-        <Text style={styles.label}>Tautan (Link Social Media / Tautan Lebih Lanjut)</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Tautan"
-          value={link}
-          onChangeText={setLink}
-        />
+    <Text style={styles.label}>Tautan (Link Social Media / Tautan Lebih Lanjut)</Text>
+    <TextInput
+      style={styles.input}
+      placeholder="Tautan"
+      value={link}
+      onChangeText={setLink}
+    />
 
-        <Text style={styles.label}>Waktu Mulai</Text>
-        <TouchableOpacity onPress={() => showDatePicker('startTime')} style={styles.dateButton}>
-          <Text style={styles.dateText}>{startTime.toLocaleTimeString()}</Text>
-        </TouchableOpacity>
-        {showStartTimePicker && (
-          <DateTimePicker
-            value={startTime}
-            mode="time"
-            display="default"
-            onChange={(event, time) => handleDateChange('startTime', event, time)}
-          />
-        )}
+    <Text style={styles.label}>Waktu Mulai</Text>
+    <TouchableOpacity onPress={() => showDatePicker('startTime')} style={styles.dateButton}>
+      <Text style={styles.dateText}>{startTime.toLocaleTimeString()}</Text>
+    </TouchableOpacity>
+    {showStartTimePicker && (
+      <DateTimePicker
+        value={startTime}
+        mode="time"
+        display="default"
+        onChange={(event, time) => handleDateChange('startTime', event, time)}
+      />
+    )}
 
-        <Text style={styles.label}>Waktu Selesai</Text>
-        <TouchableOpacity onPress={() => showDatePicker('endTime')} style={styles.dateButton}>
-          <Text style={styles.dateText}>{endTime.toLocaleTimeString()}</Text>
-        </TouchableOpacity>
-        {showEndTimePicker && (
-          <DateTimePicker
-            value={endTime}
-            mode="time"
-            display="default"
-            onChange={(event, time) => handleDateChange('endTime', event, time)}
-          />
-        )}
+    <Text style={styles.label}>Waktu Selesai</Text>
+    <TouchableOpacity onPress={() => showDatePicker('endTime')} style={styles.dateButton}>
+      <Text style={styles.dateText}>{endTime.toLocaleTimeString()}</Text>
+    </TouchableOpacity>
+    {showEndTimePicker && (
+      <DateTimePicker
+        value={endTime}
+        mode="time"
+        display="default"
+        onChange={(event, time) => handleDateChange('endTime', event, time)}
+      />
+    )}
 
-        <Text style={styles.label}>Tanggal Akhir Registrasi</Text>
-        <TouchableOpacity onPress={() => showDatePicker('registrationEnd')} style={styles.dateButton}>
-          <Text style={styles.dateText}>{registrationEnd.toDateString()}</Text>
-        </TouchableOpacity>
-        {showRegistrationEndPicker && (
-          <DateTimePicker
-            value={registrationEnd}
-            mode="date"
-            display="default"
-            onChange={(event, date) => handleDateChange('registrationEnd', event, date)}
-          />
-        )}
-        <Text style={styles.label}>Upload Thumbnail (image)</Text>
-        <TouchableOpacity style={styles.button} onPress={handleImagePick}>
-          <Text style={styles.buttonText}>Unggah Gambar Sebagai Thumbnail Postingan</Text>
-        </TouchableOpacity>
-        <Text style={styles.label}>Unggah Proposal (PDF)</Text>
-        <TouchableOpacity style={styles.button} onPress={handleFilePick}>
-          <Text style={styles.buttonText}>Unggah Proposal Sesuai Format</Text>
-        </TouchableOpacity>
+    <Text style={styles.label}>Tanggal Akhir Registrasi</Text>
+    <TouchableOpacity onPress={() => showDatePicker('registrationEnd')} style={styles.dateButton}>
+      <Text style={styles.dateText}>{registrationEnd.toDateString()}</Text>
+    </TouchableOpacity>
+    {showRegistrationEndPicker && (
+      <DateTimePicker
+        value={registrationEnd}
+        mode="date"
+        display="default"
+        onChange={(event, date) => handleDateChange('registrationEnd', event, date)}
+      />
+    )}
 
-        <Text style={styles.label}>Unggah Surat Pernyataan (PDF)</Text>
-        <TouchableOpacity style={styles.button} onPress={handleFilePick}>
-          <Text style={styles.buttonText}>Unggah Surat Pernyataan Dengan Tanda Tangan & Materai</Text>
-        </TouchableOpacity>
+    <Text style={styles.label}>Upload Thumbnail (image)</Text>
+    <TouchableOpacity style={styles.button} onPress={handleImagePick}>
+      <Text style={styles.buttonText}>Unggah Gambar Sebagai Thumbnail Postingan</Text>
+    </TouchableOpacity>
 
-        <Text style={styles.label}>Tautan Berkas</Text>
-        <TouchableOpacity onPress={() => Linking.openURL('https://example.com/syarat-berkas')}>
-          <Text style={styles.link}>Tautan Untuk Format Surat Pernyataan (DOC)</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => Linking.openURL('https://example.com/syarat-berkas')}>
-          <Text style={styles.link}>Tautan Untuk Format Proposal (DOC)</Text>
-        </TouchableOpacity>
+    <Text style={styles.label}>Unggah Proposal (PDF)</Text>
+    <TouchableOpacity style={styles.button} onPress={handleFilePick}>
+      <Text style={styles.buttonText}>Unggah Proposal Sesuai Format</Text>
+    </TouchableOpacity>
 
-        <View style={styles.checkboxContainer}>
-          <TouchableOpacity onPress={() => setIsChecked(!isChecked)} style={styles.checkbox}>
-            {isChecked && <View style={styles.checked} />}
-          </TouchableOpacity>
-          <Text style={styles.labelCheck}>
-            Saya menyetujui kebijakan aplikasi EventaStand dan siap bertanggung jawab atas semua informasi saya.
-          </Text>
-        </View>
-      </ScrollView>
-      <TouchableOpacity
-        onPress={() => navigation.navigate('UploadReview')}
-        style={[styles.button, { borderWidth: 1, backgroundColor: 'transparent', borderColor: '#ac1484' }]}
-      >
-        <Text style={[styles.buttonText, { fontWeight: 'bold', color: '#ac1484', fontSize: 15 }]}>Submit</Text>
+    <Text style={styles.label}>Unggah Surat Pernyataan (PDF)</Text>
+    <TouchableOpacity style={styles.button} onPress={handleFilePick}>
+      <Text style={styles.buttonText}>Unggah Surat Pernyataan Dengan Tanda Tangan & Materai</Text>
+    </TouchableOpacity>
+
+    <Text style={styles.label}>Tautan Berkas</Text>
+    <TouchableOpacity onPress={() => Linking.openURL('https://example.com/syarat-berkas')}>
+      <Text style={styles.link}>Tautan Untuk Format Surat Pernyataan (DOC)</Text>
+    </TouchableOpacity>
+    <TouchableOpacity onPress={() => Linking.openURL('https://example.com/syarat-berkas')}>
+      <Text style={styles.link}>Tautan Untuk Format Proposal (DOC)</Text>
+    </TouchableOpacity>
+
+    <View style={styles.checkboxContainer}>
+      <TouchableOpacity onPress={() => setIsChecked(!isChecked)} style={styles.checkbox}>
+        {isChecked && <View style={styles.checked} />}
       </TouchableOpacity>
+      <Text style={styles.labelCheck}>Saya menyetujui kebijakan aplikasi EventaStand dan siap 
+        bertanggung jawab atas semua informasi saya.
+      </Text>
     </View>
-  );
+  </ScrollView>
+  <TouchableOpacity onPress={handleSubmit} style={[styles.button, 
+    {borderWidth:1,backgroundColor:'transparent'  ,borderColor:'#ac1484'}]}>
+    <Text style={[styles.buttonText, {
+      fontWeight:'bold',color:'#ac1484',fontSize:15}]}>Submit Berkas</Text>
+  </TouchableOpacity>
+</View>
+);
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-  },
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 1,
-    marginTop:35
-  },
-  notifTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginLeft: 10,
-  },
-  label: {
-    marginTop: 20,
-    marginBottom: 5,
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ac1484',
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 7,
-    fontSize: 16,
-  },
-  textArea: {
-    borderWidth: 1,
-    borderColor: '#ac1484',
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 7,
-    fontSize: 16,
-    height: 100, // Adjust height as needed
-    textAlignVertical: 'top', // For multiline text alignment
-  },
-  dateButton: {
-    borderWidth: 1,
-    borderColor: '#ac1484',
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 7,
-    marginTop: 5,
-  },
-  dateText: {
-    fontSize: 16,
-  },
-  button: {
-    backgroundColor: '#ac1484',
-    borderRadius: 5,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    marginTop: 10,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-  },
-  link: {
-    color: '#ac1484',
-    fontSize: 16,
-    marginTop: 5,
-  },
-  checkboxContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  checkbox: {
-    width: 20,
-    height: 20,
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: '#ac1484',
-    marginRight: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  checked: {
-    width: 14,
-    height: 14,
-    backgroundColor: '#ac1484',
-    borderRadius: 3,
-  },
-  labelCheck: {
-    fontSize: 14,
-    flexWrap: 'wrap',
-    flex: 1,
-  },
-  categoryContainer: {
-    borderColor: '#ac1484',
-    borderWidth: 1,
-    marginTop: 15,
-    padding: 10,
-    borderRadius: 5,
-  },
   mapContainer: {
     borderColor: '#ac1484',
     borderWidth: 1,
@@ -379,6 +331,101 @@ const styles = StyleSheet.create({
   inputContainer: {
     marginBottom: 15,
   },
-});
+  container: {
+    flex: 1,
+    padding: 20,
+  },
+  label: {
+    marginTop: 20,
+    fontSize: 13,
+    fontWeight: 'bold',
+  },
+  input: {
+    height: 40,
+    borderColor: '#ac1484',
+    borderWidth: 1,
+    marginTop: 10,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+  },
+  textArea: {
+    height: 100,
+    borderColor: '#ac1484',
+    borderWidth: 1,
+    marginTop: 10,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+  },
+  dateButton: {
+    height: 40,
+    borderColor: '#ac1484',
+    borderWidth: 1,
+    marginTop: 10,
+    justifyContent: 'center',
+    paddingHorizontal: 10,
+    borderRadius: 5,
+  },
+  dateText: {
+    fontSize: 14,
+  },
+  button: {
+    backgroundColor: '#ac1484',
+    borderRadius: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    marginVertical:1,
 
+  },
+  buttonText : {
+    color : 'white',
+    fontSize:12
+  },
+  notifTitle : {
+    fontSize : 18,
+    fontWeight:'bold',
+   
+    },
+    titleContainer : {
+      flexDirection : 'row',
+      alignItems:'center',
+      width:'100%',
+      paddingVertical :20,
+      borderBottomWidth:3,
+      borderBottomColor:'#ac1484',
+      justifyContent:'space-between'
+    },
+    link: {
+      color: 'blue',
+      textDecorationLine: 'underline',
+      marginVertical: 8,
+      textAlign:'left',
+      fontSize:12
+    },
+    checkboxContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginVertical: 20,
+    },
+    checkbox: {
+      height: 20,
+      width: 20,
+      borderWidth: 2,
+      borderColor: '#ac1484',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: 10,
+    },
+    checked: {
+      width: 12,
+      height: 12,
+      backgroundColor: '#ac1484',
+    },
+    labelCheck : {
+      fontSize: 13,
+      // fontWeight: 'bold',
+      fontStyle:'italic',
+      width:'93%'
+   },
+});
 export default CreateEvent;
