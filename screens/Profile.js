@@ -75,7 +75,7 @@ const BottomNavBar = () => {
 
 const Profile =  () => {
 
-  const [userData, setUserData] = useState(null);
+  const [userData, setUserData] = useState('Loading...');
   const [error, setError] = useState(null);
   
   const handleSignout = () => {
@@ -119,7 +119,7 @@ const Profile =  () => {
       <View style={styles.container}>
     <Text style={styles.profileTitle}>Profil Anda</Text>
     <Image style={{marginVertical:15}} source={require('../assets/profilepicture.png')}/>
-    <Text style={styles.profileUsername}>{userData?.Username ?? 'Loading...'}</Text>
+    <Text style={styles.profileUsername}>{userData ? userData.Username : 'Loading...'}</Text>
     <View style={styles.containerButtons}>
     <ProfileButton address='EditProfile' text='Atur Profil'/>
       <ProfileButton address='Notification1' text='Notifikasi'/>

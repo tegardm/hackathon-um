@@ -98,7 +98,7 @@ const NearbyUMKM = () => {
       <View style={styles.container}>
         <View style={styles.acaraContainer}>
           
-        <Pressable onPress={() => navigation.navigate('Saved')}><Text style={[styles.acaraTitle, 
+        <Pressable onPress={() => navigation.navigate('Saved', {text:text})}><Text style={[styles.acaraTitle, 
           {color:'gray',borderColor:'lightgray',fontWeight:'normal'}]}>Acara Sekitar</Text></Pressable>
         <Pressable><Text style={styles.acaraTitle}>UMKM Sekitar</Text></Pressable>
 
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     height: 40,
   },
   acaraRibbon : {
-    fontSize:17,
+    fontSize:15,
     marginVertical:20,
     paddingVertical:15,
     backgroundColor: '#ac1484',
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     borderBottomColor:'lightgray'
   },
   eventTitle : {
-    fontSize :18,
+    fontSize :14,
     marginBottom:5,
     fontWeight : 'bold'
   },

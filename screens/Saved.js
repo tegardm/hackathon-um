@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     height: 40,
   },
   acaraRibbon : {
-    fontSize:17,
+    fontSize:15,
     marginVertical:20,
     paddingVertical:15,
     backgroundColor: '#ac1484',
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
     borderBottomColor:'lightgray'
   },
   eventTitle : {
-    fontSize :18,
+    fontSize :15,
     marginBottom:5,
     fontWeight : 'bold'
   },

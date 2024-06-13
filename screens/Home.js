@@ -5,6 +5,7 @@ import Icon from 'react-native-vector-icons/FontAwesome'; // Import the icon lib
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '../firebase';
 import { doc, getDoc } from 'firebase/firestore';
+import categoryData from '../assets/data/categories.json'
 
 // Define the SearchBar component
 const SearchBar = ({ placeholder, onSearch }) => {
@@ -42,7 +43,7 @@ const NavTop = ({username}) => {
           <Image style={{margin:5}} source={require('../assets/layer-2.png')} />
           <Text style={{fontSize:15, marginLeft:5,color:'gray'}}> Nama Kota</Text>
         </Text>
-        <Text style={styles.usernameNav}>{username}</Text>
+        <Text style={styles.usernameNav}>{username ? username : 'Loading...'}</Text>
       </View>
       <View style={styles.navInfo}>
         <Pressable onPress={() => navigation.navigate("Notification1")}>
@@ -62,16 +63,21 @@ const NavTop = ({username}) => {
   );
 };
 
-const Category = () => {
+const Category = ({text}) => {
+  const navigation = useNavigation();
+
+
   return (
-    <View style={styles.containerCategory}>
+    <Pressable onPress={() => navigation.navigate('Saved',{text:text})}>
+      <View style={styles.containerCategory}>
       <ImageBackground
         source={require('../assets/background.png')}
         style={styles.boxCategory}
         imageStyle={{ borderRadius: 20 }}>
-        <Text style={styles.textCategory}>Olaahraga</Text>
+        <Text style={styles.textCategory}>{text}</Text>
       </ImageBackground>
     </View>
+    </Pressable>
   );
 }
 
@@ -127,7 +133,15 @@ const BottomNavBar = () => {
 };
 
 const Home = () => {
-  const [userData, setUserData] = useState(null);
+
+  const [categories,setCategories] = useState([]);
+
+  useEffect(() => {
+    const sliced = categoryData.slice(0,6)
+    setCategories(sliced)
+  }, [])
+
+  const [userData, setUserData] = useState('Loading...');
   const [error, setError] = useState(null);
   
   useEffect(() => {
@@ -186,13 +200,10 @@ const Home = () => {
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View style={styles.categoriesItems}>
-          <Category/>
-          <Category/>
-          <Category/>
-          <Category/>
-
-          <Category/>
-          <Category/>
+          {categories.map((category,index) => (
+                      <Category key={index} text={category.title}/>
+          ))}
+          
           {/* Tambahkan kategori tambahan di sini */}
         </View>
       </ScrollView>
@@ -314,7 +325,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   textCategory: {
-    fontSize: 15,
+    fontSize: 14,
+    width:'90%',
+    textAlign:'center',
     fontWeight: 'bold',
     color: 'white', // Ganti dengan warna teks yang sesuai
   },
