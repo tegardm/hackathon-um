@@ -1,10 +1,13 @@
 import * as React from "react";
+import { useState,useEffect } from 'react';
 import { Image, View, Text, StyleSheet, Linking, ScrollView, TextInput,ImageBackground, TouchableOpacity, Pressable } from 'react-native'; // Import TextInput
 import { useNavigation } from "@react-navigation/native";
 import { Color, FontFamily, FontSize, Border } from "../GlobalStyles";
 import Icon from 'react-native-vector-icons/FontAwesome'; // Import the icon library
 import { signOut } from "firebase/auth";
 import {firebase, auth, db} from "../firebase"
+import { doc, getDoc } from 'firebase/firestore';
+
 const ProfileButton = ({text, address}) => {
   const navigation = useNavigation();
 
@@ -70,7 +73,10 @@ const BottomNavBar = () => {
   );
 };
 
-const Profile = () => {
+const Profile =  () => {
+
+  const [userData, setUserData] = useState(null);
+  const [error, setError] = useState(null);
   
   const handleSignout = () => {
     auth.signOut().then(() => {
@@ -80,7 +86,32 @@ const Profile = () => {
       console.log(error);
     })
   }
+  useEffect(() => {
 
+    const fetchUserData = async () => {
+      try {
+        const user = auth.currentUser;
+        console.log('Current user:', user);
+        if (user) {
+          const userDocRef = doc(db, 'users', user.uid);
+          const userDoc = await getDoc(userDocRef);
+          if (userDoc.exists()) {
+            await setUserData(userDoc.data());
+            console.log(userData.Username);
+          } else {
+            setError('No user data found.');
+          }
+        } else {
+          setError('No user is signed in.');
+        }
+      } catch (error) {
+        console.error('Error fetching user data: ', error);
+        setError('Failed to fetch user data.');
+      }
+    };
+
+    fetchUserData();
+  }, []);
   const navigation = useNavigation();
 
   return (
@@ -88,7 +119,7 @@ const Profile = () => {
       <View style={styles.container}>
     <Text style={styles.profileTitle}>Profil Anda</Text>
     <Image style={{marginVertical:15}} source={require('../assets/profilepicture.png')}/>
-    <Text style={styles.profileUsername}>Tegar Deyustian</Text>
+    <Text style={styles.profileUsername}>{userData?.Username ?? 'Loading...'}</Text>
     <View style={styles.containerButtons}>
     <ProfileButton address='EditProfile' text='Atur Profil'/>
       <ProfileButton address='Notification1' text='Notifikasi'/>

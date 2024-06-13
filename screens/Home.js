@@ -4,7 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import Icon from 'react-native-vector-icons/FontAwesome'; // Import the icon library
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '../firebase';
-import categoryData from '../assets/data/categories.json'
+import { doc, getDoc } from 'firebase/firestore';
 
 // Define the SearchBar component
 const SearchBar = ({ placeholder, onSearch }) => {
@@ -42,7 +42,7 @@ const NavTop = ({username}) => {
           <Image style={{margin:5}} source={require('../assets/layer-2.png')} />
           <Text style={{fontSize:15, marginLeft:5,color:'gray'}}> Nama Kota</Text>
         </Text>
-        <Text style={styles.usernameNav}>{username ? username : 'Username User'}</Text>
+        <Text style={styles.usernameNav}>{username}</Text>
       </View>
       <View style={styles.navInfo}>
         <Pressable onPress={() => navigation.navigate("Notification1")}>
@@ -62,22 +62,16 @@ const NavTop = ({username}) => {
   );
 };
 
-const Category = ({text}) => {
-
-
-  const navigation = useNavigation();
-
+const Category = () => {
   return (
-    <Pressable onPress={() => navigation.navigate('Saved',{text:text})}>
-      <View style={styles.containerCategory}>
+    <View style={styles.containerCategory}>
       <ImageBackground
         source={require('../assets/background.png')}
         style={styles.boxCategory}
         imageStyle={{ borderRadius: 20 }}>
-        <Text style={styles.textCategory}>{text}</Text>
+        <Text style={styles.textCategory}>Olaahraga</Text>
       </ImageBackground>
     </View>
-    </Pressable>
   );
 }
 
@@ -133,23 +127,40 @@ const BottomNavBar = () => {
 };
 
 const Home = () => {
-  const [categories,setCategories] = useState()
-
-
-  const [username,setUsername] = useState()
-
+  const [userData, setUserData] = useState(null);
+  const [error, setError] = useState(null);
+  
   useEffect(() => {
-    setCategories(categoryData)
 
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        // Ambil username dari objek pengguna Firebase
-        setUsername(user.username);
+    const fetchUserData = async () => {
+      try {
+        const user = auth.currentUser;
+        console.log('Current user:', user);
+        if (user) {
+          const userDocRef = doc(db, 'users', user.uid);
+          const userDoc = await getDoc(userDocRef);
+          if (userDoc.exists()) {
+            console.log("Processing data...");
+            try {
+              setUserData(userDoc.data());
+            } catch (error) {
+              console.log("Error when set data: ", error);
+            }
+            
+            console.log(userData.Username);
+          } else {
+            setError('No user data found.');
+          }
+        } else {
+          setError('No user is signed in.');
+        }
+      } catch (error) {
+        console.error('Error fetching user data: ', error);
+        setError('Failed to fetch user data.');
       }
-    });
+    };
 
-    return unsubscribe;
-    
+    fetchUserData();
   }, []);
 
   const navigation = useNavigation();
@@ -160,10 +171,11 @@ const Home = () => {
     setSearchText(value);
     // Do something with the search text, for example, filter data
   };
+
   return (
     <View>
     <ScrollView   style={styles.container}>
-      <NavTop username={username} />
+      <NavTop username={userData?.Username ?? 'Loading...'} />
       <SearchBar placeholder="Search..." onSearch={handleSearch} />
       <View style={styles.categories}>
         <View style={{flexDirection:'row',alignItems:'center', justifyContent:'space-between'}}>
@@ -174,8 +186,13 @@ const Home = () => {
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View style={styles.categoriesItems}>
-             <Category text='asa' />
-         
+          <Category/>
+          <Category/>
+          <Category/>
+          <Category/>
+
+          <Category/>
+          <Category/>
           {/* Tambahkan kategori tambahan di sini */}
         </View>
       </ScrollView>
@@ -297,10 +314,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   textCategory: {
-    fontSize: 14,
-    width:'90%',
-    margin:'auto',
-    textAlign:'center',
+    fontSize: 15,
     fontWeight: 'bold',
     color: 'white', // Ganti dengan warna teks yang sesuai
   },
