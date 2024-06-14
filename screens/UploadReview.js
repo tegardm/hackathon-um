@@ -24,7 +24,7 @@ const UploadReview = () => {
           source={require("../assets/2.png")}
         />
       </View>
-      <TouchableOpacity onPress={() => navigation.navigate('Home')} style={[styles.button, styles.imagePosition]}>
+      <TouchableOpacity onPress={() => navigation.replace('Home')} style={[styles.button, styles.imagePosition]}>
         <Text style={[styles.tambahEvent, styles.tambahEventTypo]}>
           Kembali ke Home
         </Text>

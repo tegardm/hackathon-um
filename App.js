@@ -21,6 +21,7 @@ import UploadReview from "./screens/UploadReview";
 import DetailEvent from "./screens/DetailEvent";
 import AprovedEvent from "./screens/AprovedEvent";
 import NearbyUMKM from "./screens/NearbyUMKM";
+import Chat from "./screens/Chat";
 
 
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -140,6 +141,11 @@ const App = () => {
             <Stack.Screen
               name="AprovedEvent"
               component={AprovedEvent}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="Chat"
+              component={Chat}
               options={{ headerShown: false }}
             />
           </Stack.Navigator>

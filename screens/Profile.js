@@ -137,6 +137,7 @@ const Profile =  () => {
 
 const styles = StyleSheet.create({
   container: {
+    height:'100%',
     paddingVertical: 40,
     paddingHorizontal: 20,
     alignItems:'center'
@@ -177,25 +178,22 @@ const styles = StyleSheet.create({
     alignItems:'center',
     gap:10
    },
-   
-  containerNavDown: {
+   containerNavDown: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
     backgroundColor: '#ac1484',
     padding: 5,
     position: 'absolute',
-    bottom: -50,
+    bottom: 0,
     left: 0,
     right: 0,
     width: '100%',
-    textAlign:'center',
-    zIndex: 999, 
+    zIndex: 999,
   },
   buttonNavDown: {
     padding: 10,
-    textAlign:'center',
-    alignItems:'center'
+    alignItems: 'center',
   },
 });
 

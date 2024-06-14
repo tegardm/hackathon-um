@@ -33,7 +33,7 @@ const NavTop = ({ username, city }) => {
   return (
     <View style={styles.navTop}>
       <View>
-        <Pressable onPress={() => navigation.navigate("LocationSelector")}>
+        <Pressable onPress={() => navigation.replace("LocationSelector")}>
           <Text style={styles.cityNav}>
             <Image style={{ margin: 5 }} source={require('../assets/layer-2.png')} />
             <Text style={{ fontSize: 15, marginLeft: 5, color: 'gray' }}> {city ?? 'Loading...'}</Text>
@@ -42,10 +42,10 @@ const NavTop = ({ username, city }) => {
         <Text style={styles.usernameNav}>{username ?? 'Loading...'}</Text>
       </View>
       <View style={styles.navInfo}>
-        <Pressable onPress={() => navigation.navigate("Notification1")}>
+        <Pressable onPress={() => navigation.replace("Notification1")}>
           <Icon name="bell" size={25} color="#ac1484" />
         </Pressable>
-        <Pressable onPress={() => navigation.navigate("Profile")}>
+        <Pressable onPress={() => navigation.replace("Profile")}>
           <View style={styles.profileImageContainer}>
             <Image
               style={styles.navProfileImg}
@@ -63,7 +63,7 @@ const Category = ({ text }) => {
   const randomImageUrl = `https://random.danielpetrica.com/api/random?ref=danielpetrica.com&${new Date().getTime()}`;
 
   return (
-    <Pressable onPress={() => navigation.navigate('Saved', { text })}>
+    <Pressable onPress={() => navigation.replace('Saved', { text })}>
       <View style={styles.containerCategory}>
         <ImageBackground
           source={{ uri: randomImageUrl }}
@@ -81,7 +81,7 @@ const EventCard = ({ judul, deskripsi, lokasi, tanggal, jarak, lat, long }) => {
   const randomImageUrl = `https://random.danielpetrica.com/api/random?ref=danielpetrica.com&${new Date().getTime()}`;
 
   return (
-    <Pressable onPress={() => navigation.navigate('DetailEvent')}>
+    <Pressable onPress={() => navigation.replace('DetailEvent')}>
       <View style={styles.eventCardContainer}>
         <View>
           <ImageBackground
@@ -111,19 +111,19 @@ const BottomNavBar = () => {
 
   return (
     <View style={styles.containerNavDown}>
-      <Pressable style={styles.buttonNavDown} onPress={() => navigation.navigate("Home")}>
+      <Pressable style={styles.buttonNavDown} onPress={() => navigation.replace("Home")}>
         <Image source={require('../assets/vector9.png')} />
         <Text style={{ fontSize: 11, color: 'white' }}>Home</Text>
       </Pressable>
-      <Pressable style={styles.buttonNavDown} onPress={() => navigation.navigate("Categories")}>
+      <Pressable style={styles.buttonNavDown} onPress={() => navigation.replace("Categories")}>
         <Image source={require('../assets/vector23.png')} />
         <Text style={{ fontSize: 11, color: 'white' }}>Categories</Text>
       </Pressable>
-      <Pressable style={styles.buttonNavDown} onPress={() => navigation.navigate("Saved")}>
+      <Pressable style={styles.buttonNavDown} onPress={() => navigation.replace("Saved")}>
         <Image source={require('../assets/vector10.png')} />
         <Text style={{ fontSize: 11, color: 'white' }}>Sekitar</Text>
       </Pressable>
-      <Pressable style={styles.buttonNavDown} onPress={() => navigation.navigate("Profile")}>
+      <Pressable style={styles.buttonNavDown} onPress={() => navigation.replace("Profile")}>
         <Image source={require('../assets/icon1.png')} />
         <Text style={{ fontSize: 11, color: 'white' }}>Profile</Text>
       </Pressable>
@@ -201,6 +201,7 @@ const Home = () => {
     event.EventName.toLowerCase().includes(searchText.toLowerCase()) ||
     event.EventDescription.toLowerCase().includes(searchText.toLowerCase())
   );
+  const navigation = useNavigation();
 
   return (
     <View style={{ flex: 1 }}>
@@ -211,7 +212,7 @@ const Home = () => {
         <View style={styles.categories}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <Text style={styles.categoriesTitle}>Kategori</Text>
-            <Pressable onPress={() => navigation.navigate("Categories")}>
+            <Pressable onPress={() => navigation.replace("Categories")}>
               <Text style={{ color: '#ac1484' }}>Lihat Lainnya</Text>
             </Pressable>
           </View>
@@ -223,11 +224,11 @@ const Home = () => {
             </View>
           </ScrollView>
         </View>
-  
+
         <View style={{ flex: 1 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <Text style={styles.categoriesTitle}>Event Sekitar</Text>
-            <Pressable onPress={() => navigation.navigate("Saved")}>
+            <Pressable onPress={() => navigation.replace("Saved")}>
               <Text style={{ color: '#ac1484' }}>Lihat Lainnya</Text>
             </Pressable>
           </View>
