@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Image, View, Text, StyleSheet, ScrollView, TextInput,ImageBackground, TouchableOpacity, Pressable } from 'react-native'; // Import TextInput
+import { Image, View, Text, StyleSheet, ScrollView, TextInput,ImageBackground, TouchableOpacity, Pressable } from 'react-native'; 
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Border, FontFamily, Color, FontSize } from "../GlobalStyles";
-import Icon from 'react-native-vector-icons/FontAwesome'; // Import the icon library
+import Icon from 'react-native-vector-icons/FontAwesome'; 
 
 
 const SearchBar = ({ placeholder, onSearch }) => {
