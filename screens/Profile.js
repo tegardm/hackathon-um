@@ -53,19 +53,19 @@ const BottomNavBar = () => {
 
   return (
     <View style={styles.containerNavDown}>
-      <Pressable style={styles.buttonNavDown} onPress={() => navigation.navigate("Home")}>
+      <Pressable style={styles.buttonNavDown} onPress={() => navigation.replace("Home")}>
         <Image source={require('../assets/vector24.png')}/>
         <Text style={{fontSize:11, color:'white'}}>Home</Text>
       </Pressable>
-      <Pressable style={styles.buttonNavDown}  onPress={() => navigation.navigate("Categories")}>
+      <Pressable style={styles.buttonNavDown}  onPress={() => navigation.replace("Categories")}>
       <Image source={require('../assets/vector23.png')}/>
       <Text style={{fontSize:11, color:'white'}}>Categories</Text>
       </Pressable>
-      <Pressable style={styles.buttonNavDown}  onPress={() => navigation.navigate("Saved")}>
+      <Pressable style={styles.buttonNavDown}  onPress={() => navigation.replace("Saved")}>
       <Image source={require('../assets/vector10.png')}/>
       <Text style={{fontSize:11, color:'white'}}>Sekitar</Text>
       </Pressable>
-      <Pressable style={styles.buttonNavDown}  onPress={() => navigation.navigate("Profile")}>
+      <Pressable style={styles.buttonNavDown}  onPress={() => navigation.replace("Profile")}>
       <Image  source={require('../assets/profile1335.png')}/>
       <Text style={{fontSize:11, color:'white'}}>Profile</Text>
       </Pressable>   

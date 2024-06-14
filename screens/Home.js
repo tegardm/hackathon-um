@@ -1,10 +1,10 @@
 import React, { useState,useEffect } from 'react';
-import { Image, View, Text, StyleSheet, ScrollView, TextInput,ImageBackground, TouchableOpacity, Pressable } from 'react-native'; // Import TextInput
+import { Image, View, Text, StyleSheet, ScrollView, TextInput,ImageBackground, TouchableOpacity, FlatList, Pressable } from 'react-native'; // Import TextInput
 import { useNavigation } from "@react-navigation/native";
 import Icon from 'react-native-vector-icons/FontAwesome'; 
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '../firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, getDocs, collection } from 'firebase/firestore';
 import categoryData from '../assets/data/categories.json'
 
 const SearchBar = ({ placeholder, onSearch }) => {
@@ -85,7 +85,8 @@ const Category = ({text}) => {
   );
 }
 
-const EventCard = () => {
+const EventCard = ({judul, deskripsi, lokasi, tanggal, jarak, lat, long }) => {
+  console.log("Lat:", lat, "Long", long);
   const navigation = useNavigation();
 
   const randomImageUrl = `https://random.danielpetrica.com/api/random?ref=danielpetrica.com&${new Date().getTime()}`;
@@ -101,15 +102,15 @@ const EventCard = () => {
       </ImageBackground>
       </View>
       <View >
-        <Text style={styles.eventTitle}>Title Event</Text>
-        <Text style={styles.eventDesc}>ini adalah deskripsi yang akan panjang tapi saya bing....</Text>
+        <Text style={styles.eventTitle}>{judul}</Text>
+        <Text style={styles.eventDesc}>{deskripsi}</Text>
 
         <Text style={styles.eventCity}>
-        <Icon name="location-arrow" size={12} color="gray" style={styles.searchIcon} /> Malang</Text>
+        <Icon name="location-arrow" size={12} color="gray" style={styles.searchIcon} /> {lokasi}</Text>
         <View style={styles.dateDistance}>
           <Text style={styles.eventDate}>
-            <Icon padding={15} name="clock-o" size={12} color="gray" style={styles.searchIcon} /> 14 June</Text>
-          <Text style={styles.eventDistance}>2.4 Km</Text>
+            <Icon padding={15} name="clock-o" size={12} color="gray" style={styles.searchIcon} />{tanggal}</Text>
+          <Text style={styles.eventDistance}>{jarak} Km</Text>
         </View>
       </View>
     </View>
@@ -145,6 +146,27 @@ const BottomNavBar = () => {
 
 const Home = () => {
 
+  const calculateDistance = (userLat, userLng, itemLat, itemLng) => {
+    const earthRadiusKm = 6371; // Radius of the earth in kilometers
+    const dLat = degreesToRadians(itemLat - userLat);
+    const dLng = degreesToRadians(itemLng - userLng);
+  
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(degreesToRadians(userLat)) * Math.cos(degreesToRadians(itemLat)) *
+      Math.sin(dLng / 2) * Math.sin(dLng / 2);
+  
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = earthRadiusKm * c; // Distance in kilometers
+  
+    return distance;
+  };
+  
+  // Function to convert degrees to radians
+  const degreesToRadians = (degrees) => {
+    return degrees * (Math.PI / 180);
+  };
+
   const [categories,setCategories] = useState([]);
 
   useEffect(() => {
@@ -153,11 +175,16 @@ const Home = () => {
   }, [])
 
   const [userData, setUserData] = useState('Loading...');
+  const [eventData, setEventData] = useState([]);
   const [error, setError] = useState(null);
+  const [latitude, setLatitude] = useState('');
+  const [longitude, setLongitude] = useState('');
   
   useEffect(() => {
 
     const fetchUserData = async () => {
+      
+      //Data user
       try {
         const user = auth.currentUser;
         console.log('Current user:', user);
@@ -168,11 +195,14 @@ const Home = () => {
             console.log("Processing data...");
             try {
               setUserData(userDoc.data());
+              setLatitude(userData.location.latitude);
+              setLongitude(userData.location.longitude);
             } catch (error) {
               console.log("Error when set data: ", error);
             }
             
             console.log(userData.Username);
+            console.log(userData.location.latitude);
           } else {
             setError('No user data found.');
           }
@@ -182,6 +212,21 @@ const Home = () => {
       } catch (error) {
         console.error('Error fetching user data: ', error);
         setError('Failed to fetch user data.');
+      }
+
+      //Data Event
+      try {
+        const dataDocRef = await getDocs(collection(db, 'events'));
+        const docsData = await dataDocRef.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          distance: setTimeout(() => {calculateDistance(latitude, longitude, doc.data().Cordinate.latitude, doc.data().Cordinate.longitude)}, 10000)
+        }));
+        setEventData(docsData);
+        console.log("Data fetch berhasil");
+        console.log("Data:", eventData);
+      } catch (error) {
+        console.log("Error fetching even data:", error);
       }
     };
 
@@ -229,11 +274,21 @@ const Home = () => {
         </View>
       <ScrollView vertical showsVerticalScrollIndicator={false}>
         <View style={styles.eventContainer}>
+
+        <FlatList
+        data={eventData}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <EventCard judul={item.EventName} deskripsi={item.EventDescription} lokasi={item.Location} tanggal={""} jarak={item.distance.toFixed(2)} lat={item.Cordinate.latitude} long={item.Cordinate.longitude}/>
+        )}
+      />
+
+
+          
+          {/* <EventCard/>
           <EventCard/>
           <EventCard/>
-          <EventCard/>
-          <EventCard/>
-          <EventCard/>
+          <EventCard/> */}
 
         </View>
         </ScrollView>
