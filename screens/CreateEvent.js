@@ -7,12 +7,12 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { auth, db } from '../firebase';
 import { doc,addDoc, getDoc, collection } from 'firebase/firestore';;
 import categoriesData from '../assets/data/categories.json'
+import MultiSelect from 'react-native-multiple-select';
 
 
 
 const CreateEvent = () => { 
 
-  
 
   const navigation = useNavigation();
   const [region, setRegion] = useState({
@@ -43,15 +43,17 @@ const CreateEvent = () => {
   const [categories,setCategories] = useState([])
   const [username,setUsername] = useState('')
   const [userId,setUserId] = useState('')
-
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [isMap, setIsMap] = useState(true)
   useEffect(() => {
-    
-    const data = []
-    categoriesData.map((category) => {
-      data.push({label:category.title,value:category.title})
-    })
+    const data = categoriesData.map((category, index) => ({
+      label: category.title,
+      value: category.title,
+      id: index.toString(), // add a unique id for each category
+    }));
 
     setCategories(data)
+  
 
     const fetchUserData = async () => {
       try {
@@ -94,7 +96,6 @@ const CreateEvent = () => {
   };
 
   const handleSubmit = async () => {
-
     
 
     const newEvent = {
@@ -102,7 +103,7 @@ const CreateEvent = () => {
       Username : username,
       EventName : eventName,
       EventDescription : eventDescription,
-      Categories : [category, 'Test','Test'],
+      Categories : selectedCategories,
       EventDateStart : eventDateStart,
       EventDateEnd : eventDateEnd,
       Location : location,
@@ -111,6 +112,7 @@ const CreateEvent = () => {
       EndTime : endTime,
       RegistrationEnd : registrationEnd,
       IsChecked : isChecked,
+      Cordinate : {latitude : region.latitude, longitude : region.longitude}
 
     }
 
@@ -151,6 +153,17 @@ const CreateEvent = () => {
     }
   };
 
+  const handleSelectedItemsChange = (selectedItems) => {
+    if (selectedItems.length <= 3) {
+      console.log(selectedItems);
+      setSelectedCategories(selectedItems);
+
+    } else {
+
+      alert('You can select up to 3 categories only');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView style={{marginBottom:20}} vertical showsVerticalScrollIndicator={false}>
@@ -176,13 +189,28 @@ onChangeText={setEventName}
       onChangeText={setEventDescription}
       multiline
     />
-    <View style={{borderColor: '#ac1484', borderWidth: 1, marginTop:15, padding:10, borderRadius:5}}>
-      <Text style={styles.label}>Kategori</Text>
-      <RNPickerSelect 
-        onValueChange={value => setCategory(value)}
-        items={categories}
-      />
-    </View>
+        <View style={styles.categoryContainer}>
+          <Text  style={[styles.label,{marginBottom:15}]}>Kategori</Text>
+          <MultiSelect
+            items={categories}
+            uniqueKey="value"
+            onSelectedItemsChange={handleSelectedItemsChange}
+            selectedItems={selectedCategories}
+            selectText="Pilih Kategori"
+            searchInputPlaceholderText="Cari Kategori..."
+            onChangeInput={(text) => console.log(text)}
+            displayKey="label"
+            submitButtonText="Submit"
+            tagRemoveIconColor="#ac1484"
+            tagBorderColor="#ac1484"
+            tagTextColor="#ac1484"
+            selectedItemTextColor="#CCC"
+            selectedItemIconColor="#CCC"
+            itemTextColor="#000"
+            searchInputStyle={{ color: '#CCC' }}
+            submitButtonColor="#ac1484"
+          />
+        </View>
 
     <Text style={styles.label}>Tanggal Awal</Text>
     <TouchableOpacity onPress={() => showDatePicker('eventDateStart')} style={styles.dateButton}>
@@ -210,7 +238,7 @@ onChangeText={setEventName}
       />
     )}
 
-    <Text style={styles.label}>Lokasi</Text>
+    <Text style={styles.label}>Alamat Lokasi</Text>
     <TextInput
       style={styles.input}
       placeholder="Lokasi"
@@ -218,16 +246,20 @@ onChangeText={setEventName}
       onChangeText={setLocation}
     />
 
-      <Text style={styles.label}>Pilih Lokasi</Text>
-        {/* <View style={styles.mapContainer}>
-          <MapView
-            style={styles.map}
-            region={region}
-            onRegionChangeComplete={setRegion}
-          >
-            <Marker coordinate={{ latitude: region.latitude, longitude: region.longitude }} />
-          </MapView>
-        </View> */}
+      <Text style={[styles.label,{fontSize:9,paddingBottom:5,fontWeight:'normal'}]}>Kordinat Lokasi (Tutup Map Sebelum Memasukan Data Lain Agar Menghindari Bug)</Text>
+      <TouchableOpacity style={styles.button} onPress={() => setIsMap(!isMap)}>
+      <Text style={styles.buttonText}>{isMap ? 'Buka Map' : "Tutup Map"}</Text>
+    </TouchableOpacity>
+    <View style={[styles.mapContainer, { display: isMap ? 'none' : 'relative' }]}>
+      <MapView
+        style={styles.map}
+        region={region}
+        onRegionChangeComplete={setRegion}
+      >
+        <Marker coordinate={{ latitude: region.latitude, longitude: region.longitude }} />
+      </MapView>
+    </View>
+
 
     <Text style={styles.label}>Tautan (Link Social Media / Tautan Lebih Lanjut)</Text>
     <TextInput
@@ -427,5 +459,12 @@ const styles = StyleSheet.create({
       fontStyle:'italic',
       width:'93%'
    },
+   categoryContainer: {
+    borderColor: '#ac1484',
+    borderWidth: 1,
+    marginTop: 15,
+    padding: 10,
+    borderRadius: 5,
+  },
 });
 export default CreateEvent;

@@ -3,7 +3,7 @@ import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Linking, S
 
 const EventDetail = () => {
   const eventDetails = {
-    thumbnail: '../assets/image-2.png',
+    thumbnail: `https://random.danielpetrica.com/api/random?ref=danielpetrica.com&${new Date().getTime()}`,
     name: 'Nama Event',
     description: 'Deskripsi event yang sangat menarik dan informatif Deskripsi event yang sangat menarik dan informatif Deskripsi event yang sangat menarik dan informatif.',
     category: 'Kategori Event',
@@ -20,7 +20,7 @@ const EventDetail = () => {
   return (
     <SafeAreaView style={styles.safeContainer}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Image source={require('../assets/image-2.png')} style={styles.thumbnail} />
+        <Image source={{uri:eventDetails.thumbnail}} style={styles.thumbnail} />
         <View style={styles.detailsContainer}>
           <Text style={styles.name}>{eventDetails.name}</Text>
           <Text style={styles.description}>{eventDetails.description}</Text>

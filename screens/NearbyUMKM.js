@@ -30,11 +30,15 @@ const SearchBar = ({ placeholder, onSearch }) => {
 
 
 const EventCard = ({title}) => {
+  const randomImageUrl = `https://random.danielpetrica.com/api/random?ref=danielpetrica.com&${new Date().getTime()}`;
+
   return (
+    <Pressable onPress={() => navigation.navigate('DetailEvent')}>
+
     <View style={styles.eventCardContainer}>
       <View>
         <ImageBackground
-          source={require('../assets/background.png')}
+          source={{ uri: randomImageUrl}}
           style={styles.boxEvent}
           imageStyle={{ borderRadius: 20 }}>
         </ImageBackground>
@@ -54,6 +58,7 @@ const EventCard = ({title}) => {
         </View>
       </View>
     </View>
+    </Pressable>
   )
 }
 

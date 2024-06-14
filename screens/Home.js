@@ -33,7 +33,7 @@ const SearchBar = ({ placeholder, onSearch }) => {
 
 
 
-const NavTop = ({username}) => {
+const NavTop = ({username,city}) => {
   const navigation = useNavigation();
 
   return (
@@ -43,7 +43,7 @@ const NavTop = ({username}) => {
         <Text style={styles.cityNav}>
           
             <Image style={{margin:5}} source={require('../assets/layer-2.png')} />
-            <Text style={{fontSize:15, marginLeft:5,color:'gray'}}> Nama Kota</Text>
+            <Text style={{fontSize:15, marginLeft:5,color:'gray'}}> {city ? city : 'Loading...'}</Text>
           
           
         </Text>
@@ -70,13 +70,14 @@ const NavTop = ({username}) => {
 
 const Category = ({text}) => {
   const navigation = useNavigation();
+  const randomImageUrl = `https://random.danielpetrica.com/api/random?ref=danielpetrica.com&${new Date().getTime()}`;
 
 
   return (
     <Pressable onPress={() => navigation.navigate('Saved',{text:text})}>
       <View style={styles.containerCategory}>
       <ImageBackground
-        source={require('../assets/background.png')}
+        source={{uri:randomImageUrl}}
         style={styles.boxCategory}
         imageStyle={{ borderRadius: 20 }}>
         <Text style={styles.textCategory}>{text}</Text>
@@ -87,14 +88,19 @@ const Category = ({text}) => {
 }
 
 const EventCard = () => {
+  const navigation = useNavigation();
+
+  const randomImageUrl = `https://random.danielpetrica.com/api/random?ref=danielpetrica.com&${new Date().getTime()}`;
+
   return (
+    <Pressable onPress={() => navigation.navigate('DetailEvent')}>
     <View style={styles.eventCardContainer}>
       <View>
-        <ImageBackground
-          source={require('../assets/background.png')}
-          style={styles.boxEvent}
-          imageStyle={{ borderRadius: 20 }}>
-        </ImageBackground>
+      <ImageBackground
+        source={{ uri: randomImageUrl}}
+        style={styles.boxEvent}
+        imageStyle={{ borderRadius: 20 }}>
+      </ImageBackground>
       </View>
       <View >
         <Text style={styles.eventTitle}>Title Event</Text>
@@ -109,6 +115,8 @@ const EventCard = () => {
         </View>
       </View>
     </View>
+    </Pressable>
+
   )
 }
 
@@ -194,7 +202,7 @@ const Home = () => {
   return (
     <View>
     <ScrollView   style={styles.container}>
-      <NavTop username={userData?.Username ?? 'Loading...'} />
+      <NavTop city={userData?.Domisili ?? 'Loading...'} username={userData?.Username ?? 'Loading...'}  />
       <SearchBar placeholder="Search..." onSearch={handleSearch} />
       <View style={styles.categories}>
         <View style={{flexDirection:'row',alignItems:'center', justifyContent:'space-between'}}>
@@ -332,6 +340,7 @@ const styles = StyleSheet.create({
   textCategory: {
     fontSize: 14,
     width:'90%',
+    textShadowColor : 'black',
     textAlign:'center',
     fontWeight: 'bold',
     color: 'white', // Ganti dengan warna teks yang sesuai
