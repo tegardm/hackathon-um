@@ -1,8 +1,7 @@
-import React, { useState,useEffect } from 'react';
-import { Image, View, Text, StyleSheet, ScrollView, TextInput,ImageBackground, TouchableOpacity, FlatList, Pressable } from 'react-native'; // Import TextInput
+import React, { useState, useEffect, useCallback } from 'react';
+import { Image, View, Text, ScrollView, TextInput, ImageBackground, StyleSheet,TouchableOpacity, FlatList, Pressable } from 'react-native'; 
 import { useNavigation } from "@react-navigation/native";
 import Icon from 'react-native-vector-icons/FontAwesome'; 
-import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '../firebase';
 import { doc, getDoc, getDocs, collection } from 'firebase/firestore';
 import categoryData from '../assets/data/categories.json'
@@ -23,101 +22,89 @@ const SearchBar = ({ placeholder, onSearch }) => {
         value={text}
         onChangeText={handleChangeText}
       />
-      <Icon name="search"  size={20} color="gray" style={styles.searchIcon} />
-
+      <Icon name="search" size={20} color="gray" style={styles.searchIcon} />
     </View>
   );
 };
 
-
-
-const NavTop = ({username,city}) => {
+const NavTop = ({ username, city }) => {
   const navigation = useNavigation();
 
   return (
     <View style={styles.navTop}>
       <View>
-      <Pressable onPress={() => navigation.navigate("LocationSelector")}>
-        <Text style={styles.cityNav}>
-          
-            <Image style={{margin:5}} source={require('../assets/layer-2.png')} />
-            <Text style={{fontSize:15, marginLeft:5,color:'gray'}}> {city ? city : 'Loading...'}</Text>
-          
-          
-        </Text>
+        <Pressable onPress={() => navigation.navigate("LocationSelector")}>
+          <Text style={styles.cityNav}>
+            <Image style={{ margin: 5 }} source={require('../assets/layer-2.png')} />
+            <Text style={{ fontSize: 15, marginLeft: 5, color: 'gray' }}> {city ?? 'Loading...'}</Text>
+          </Text>
         </Pressable>
-        <Text style={styles.usernameNav}>{username ? username : 'Loading...'}</Text>
+        <Text style={styles.usernameNav}>{username ?? 'Loading...'}</Text>
       </View>
       <View style={styles.navInfo}>
         <Pressable onPress={() => navigation.navigate("Notification1")}>
-        <Icon name="bell" size={25} color="#ac1484" />
-
+          <Icon name="bell" size={25} color="#ac1484" />
         </Pressable>
         <Pressable onPress={() => navigation.navigate("Profile")}>
-        <View style={styles.profileImageContainer}>
-          <Image
-            style={styles.navProfileImg}
-            source={require("../assets/icon11.png")}
-          />
-        </View>
+          <View style={styles.profileImageContainer}>
+            <Image
+              style={styles.navProfileImg}
+              source={require("../assets/icon11.png")}
+            />
+          </View>
         </Pressable>
       </View>
     </View>
   );
 };
 
-const Category = ({text}) => {
+const Category = ({ text }) => {
   const navigation = useNavigation();
   const randomImageUrl = `https://random.danielpetrica.com/api/random?ref=danielpetrica.com&${new Date().getTime()}`;
 
-
   return (
-    <Pressable onPress={() => navigation.navigate('Saved',{text:text})}>
+    <Pressable onPress={() => navigation.navigate('Saved', { text })}>
       <View style={styles.containerCategory}>
-      <ImageBackground
-        source={{uri:randomImageUrl}}
-        style={styles.boxCategory}
-        imageStyle={{ borderRadius: 20 }}>
-        <Text style={styles.textCategory}>{text}</Text>
-      </ImageBackground>
-    </View>
+        <ImageBackground
+          source={{ uri: randomImageUrl }}
+          style={styles.boxCategory}
+          imageStyle={{ borderRadius: 20 }}>
+          <Text style={styles.textCategory}>{text}</Text>
+        </ImageBackground>
+      </View>
     </Pressable>
   );
-}
+};
 
-const EventCard = ({judul, deskripsi, lokasi, tanggal, jarak, lat, long }) => {
-  console.log("Lat:", lat, "Long", long);
+const EventCard = ({ judul, deskripsi, lokasi, tanggal, jarak, lat, long }) => {
   const navigation = useNavigation();
-
   const randomImageUrl = `https://random.danielpetrica.com/api/random?ref=danielpetrica.com&${new Date().getTime()}`;
 
   return (
     <Pressable onPress={() => navigation.navigate('DetailEvent')}>
-    <View style={styles.eventCardContainer}>
-      <View>
-      <ImageBackground
-        source={{ uri: randomImageUrl}}
-        style={styles.boxEvent}
-        imageStyle={{ borderRadius: 20 }}>
-      </ImageBackground>
-      </View>
-      <View >
-        <Text style={styles.eventTitle}>{judul}</Text>
-        <Text style={styles.eventDesc}>{deskripsi}</Text>
-
-        <Text style={styles.eventCity}>
-        <Icon name="location-arrow" size={12} color="gray" style={styles.searchIcon} /> {lokasi}</Text>
-        <View style={styles.dateDistance}>
-          <Text style={styles.eventDate}>
-            <Icon padding={15} name="clock-o" size={12} color="gray" style={styles.searchIcon} />{tanggal}</Text>
-          <Text style={styles.eventDistance}>{jarak} Km</Text>
+      <View style={styles.eventCardContainer}>
+        <View>
+          <ImageBackground
+            source={{ uri: randomImageUrl }}
+            style={styles.boxEvent}
+            imageStyle={{ borderRadius: 20 }}>
+          </ImageBackground>
+        </View>
+        <View>
+          <Text style={styles.eventTitle}>{judul}</Text>
+          <Text style={styles.eventDesc}>{deskripsi}</Text>
+          <Text style={styles.eventCity}>
+            <Icon name="location-arrow" size={12} color="gray" style={styles.searchIcon} /> {lokasi}</Text>
+          <View style={styles.dateDistance}>
+            <Text style={styles.eventDate}>
+              <Icon padding={15} name="clock-o" size={12} color="gray" style={styles.searchIcon} />{tanggal}</Text>
+            <Text style={styles.eventDistance}>{jarak} Km</Text>
+          </View>
         </View>
       </View>
-    </View>
     </Pressable>
-
-  )
-}
+  );
+};
 
 const BottomNavBar = () => {
   const navigation = useNavigation();
@@ -125,84 +112,72 @@ const BottomNavBar = () => {
   return (
     <View style={styles.containerNavDown}>
       <Pressable style={styles.buttonNavDown} onPress={() => navigation.navigate("Home")}>
-        <Image source={require('../assets/vector9.png')}/>
-        <Text style={{fontSize:11, color:'white'}}>Home</Text>
+        <Image source={require('../assets/vector9.png')} />
+        <Text style={{ fontSize: 11, color: 'white' }}>Home</Text>
       </Pressable>
-      <Pressable style={styles.buttonNavDown}  onPress={() => navigation.navigate("Categories")}>
-      <Image source={require('../assets/vector23.png')}/>
-      <Text style={{fontSize:11, color:'white'}}>Categories</Text>
+      <Pressable style={styles.buttonNavDown} onPress={() => navigation.navigate("Categories")}>
+        <Image source={require('../assets/vector23.png')} />
+        <Text style={{ fontSize: 11, color: 'white' }}>Categories</Text>
       </Pressable>
-      <Pressable style={styles.buttonNavDown}  onPress={() => navigation.navigate("Saved")}>
-      <Image source={require('../assets/vector10.png')}/>
-      <Text style={{fontSize:11, color:'white'}}>Sekitar</Text>
+      <Pressable style={styles.buttonNavDown} onPress={() => navigation.navigate("Saved")}>
+        <Image source={require('../assets/vector10.png')} />
+        <Text style={{ fontSize: 11, color: 'white' }}>Sekitar</Text>
       </Pressable>
-      <Pressable style={styles.buttonNavDown}  onPress={() => navigation.navigate("Profile")}>
-      <Image  source={require('../assets/icon1.png')}/>
-      <Text style={{fontSize:11, color:'white'}}>Profile</Text>
-      </Pressable>   
-      </View>
+      <Pressable style={styles.buttonNavDown} onPress={() => navigation.navigate("Profile")}>
+        <Image source={require('../assets/icon1.png')} />
+        <Text style={{ fontSize: 11, color: 'white' }}>Profile</Text>
+      </Pressable>
+    </View>
   );
 };
 
 const Home = () => {
+  const [categories, setCategories] = useState(categoryData.slice(0, 6));
+  const [userData, setUserData] = useState({});
+  const [eventData, setEventData] = useState([]);
+  const [error, setError] = useState(null);
+  const [searchText, setSearchText] = useState('');
 
   const calculateDistance = (userLat, userLng, itemLat, itemLng) => {
-    const earthRadiusKm = 6371; // Radius of the earth in kilometers
+    const earthRadiusKm = 6371;
     const dLat = degreesToRadians(itemLat - userLat);
     const dLng = degreesToRadians(itemLng - userLng);
-  
+
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(degreesToRadians(userLat)) * Math.cos(degreesToRadians(itemLat)) *
       Math.sin(dLng / 2) * Math.sin(dLng / 2);
-  
+
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const distance = earthRadiusKm * c; // Distance in kilometers
-  
+    const distance = earthRadiusKm * c;
+
     return distance;
   };
-  
-  // Function to convert degrees to radians
+
   const degreesToRadians = (degrees) => {
     return degrees * (Math.PI / 180);
   };
 
-  const [categories,setCategories] = useState([]);
-
   useEffect(() => {
-    const sliced = categoryData.slice(0,6)
-    setCategories(sliced)
-  }, [])
-
-  const [userData, setUserData] = useState('Loading...');
-  const [eventData, setEventData] = useState([]);
-  const [error, setError] = useState(null);
-  const [latitude, setLatitude] = useState('');
-  const [longitude, setLongitude] = useState('');
-  
-  useEffect(() => {
-
     const fetchUserData = async () => {
-      
-      //Data user
       try {
         const user = auth.currentUser;
-        console.log('Current user:', user);
         if (user) {
           const userDocRef = doc(db, 'users', user.uid);
           const userDoc = await getDoc(userDocRef);
           if (userDoc.exists()) {
-            console.log("Processing data...");
-            try {
-              setUserData(userDoc.data());
-              setLatitude(userData.location.latitude);
-              setLongitude(userData.location.longitude);
-            } catch (error) {
-              console.log("Error when set data: ", error);
-            }
-            
-            console.log(userData.Username);
-            console.log(userData.location.latitude);
+            const data = userDoc.data();
+            setUserData(data);
+            const userLat = data.location.latitude;
+            const userLng = data.location.longitude;
+
+            const dataDocRef = await getDocs(collection(db, 'events'));
+            const docsData = dataDocRef.docs.map(doc => ({
+              id: doc.id,
+              ...doc.data(),
+              distance: calculateDistance(userLat, userLng, doc.data().Cordinate.latitude, doc.data().Cordinate.longitude)
+            }));
+            setEventData(docsData);
           } else {
             setError('No user data found.');
           }
@@ -213,95 +188,80 @@ const Home = () => {
         console.error('Error fetching user data: ', error);
         setError('Failed to fetch user data.');
       }
-
-      //Data Event
-      try {
-        const dataDocRef = await getDocs(collection(db, 'events'));
-        const docsData = await dataDocRef.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-          distance: setTimeout(() => {calculateDistance(latitude, longitude, doc.data().Cordinate.latitude, doc.data().Cordinate.longitude)}, 10000)
-        }));
-        setEventData(docsData);
-        console.log("Data fetch berhasil");
-        console.log("Data:", eventData);
-      } catch (error) {
-        console.log("Error fetching even data:", error);
-      }
     };
 
     fetchUserData();
   }, []);
 
-  const navigation = useNavigation();
-
-  const [searchText, setSearchText] = useState('');
-
-  const handleSearch = (value) => {
+  const handleSearch = useCallback((value) => {
     setSearchText(value);
+  }, []);
 
-  };
+  const filteredEvents = eventData.filter(event => 
+    event.EventName.toLowerCase().includes(searchText.toLowerCase()) ||
+    event.EventDescription.toLowerCase().includes(searchText.toLowerCase())
+  );
 
   return (
-    <View>
-    <ScrollView   style={styles.container}>
-      <NavTop city={userData?.Domisili ?? 'Loading...'} username={userData?.Username ?? 'Loading...'}  />
-      <SearchBar placeholder="Search..." onSearch={handleSearch} />
-      <View style={styles.categories}>
-        <View style={{flexDirection:'row',alignItems:'center', justifyContent:'space-between'}}>
-        <Text style={styles.categoriesTitle}>Kategori</Text>
-        <Pressable onPress={() => navigation.navigate("Categories")}>
-        <Text style={{color:'#ac1484'}}>Lihat Lainnya</Text>
-        </Pressable>
+    <View style={{ flex: 1 }}>
+      <ScrollView showsVerticalScrollIndicator={false} style={styles.container}>
+        <NavTop city={userData?.Domisili} username={userData?.Username} />
+        <SearchBar placeholder="Search..." onSearch={handleSearch} />
+        
+        <View style={styles.categories}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Text style={styles.categoriesTitle}>Kategori</Text>
+            <Pressable onPress={() => navigation.navigate("Categories")}>
+              <Text style={{ color: '#ac1484' }}>Lihat Lainnya</Text>
+            </Pressable>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View style={styles.categoriesItems}>
+              {categories.map((category, index) => (
+                <Category key={index} text={category.title} />
+              ))}
+            </View>
+          </ScrollView>
         </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        <View style={styles.categoriesItems}>
-          {categories.map((category,index) => (
-                      <Category key={index} text={category.title}/>
-          ))}
-          
-          {/* Tambahkan kategori tambahan di sini */}
+  
+        <View style={{ flex: 1 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Text style={styles.categoriesTitle}>Event Sekitar</Text>
+            <Pressable onPress={() => navigation.navigate("Saved")}>
+              <Text style={{ color: '#ac1484' }}>Lihat Lainnya</Text>
+            </Pressable>
+          </View>
+          {/* Pastikan konten event ada dalam View yang diatur dengan flex: 1 */}
+          <View style={{ flex: 1 ,marginBottom:150}}>
+            {filteredEvents.length > 0 ? (
+              filteredEvents.map((item) => (
+                <EventCard
+                  key={item.id.toString()}
+                  judul={item.EventName}
+                  deskripsi={item.EventDescription}
+                  lokasi={item.Location}
+                  tanggal={""}
+                  jarak={item.distance.toFixed(2)}
+                  lat={item.Cordinate.latitude}
+                  long={item.Cordinate.longitude}
+                />
+              ))
+            ) : (
+              <Text style={styles.noEventsText}>No events found.</Text>
+            )}
+          </View>
         </View>
+  
       </ScrollView>
-
-      </View>
-      <View style={{flex:1}}>
-      <View style={{flexDirection:'row',alignItems:'center', justifyContent:'space-between'}}>
-      <Text style={styles.categoriesTitle}>Event Sekitar</Text>
-        <Pressable onPress={() => navigation.navigate("Saved")}>
-        <Text style={{color:'#ac1484'}}>Lihat Lainnya</Text>
-        </Pressable>
-        </View>
-      <ScrollView vertical showsVerticalScrollIndicator={false}>
-        <View style={styles.eventContainer}>
-
-        <FlatList
-        data={eventData}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <EventCard judul={item.EventName} deskripsi={item.EventDescription} lokasi={item.Location} tanggal={""} jarak={item.distance.toFixed(2)} lat={item.Cordinate.latitude} long={item.Cordinate.longitude}/>
-        )}
-      />
-
-
-          
-          {/* <EventCard/>
-          <EventCard/>
-          <EventCard/>
-          <EventCard/> */}
-
-        </View>
-        </ScrollView>
-      </View>
-    </ScrollView>
-    <BottomNavBar/>
+      <BottomNavBar />
     </View>
-  );
+  )
 };
 
 const styles = StyleSheet.create({
   
   container: {
+    minHeight:'100%',
     paddingVertical: 40,
     paddingHorizontal: 20,
   },
@@ -465,13 +425,15 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     width: '100%',
-    textAlign:'center',
-    zIndex: 999, 
+    zIndex: 999,
   },
   buttonNavDown: {
     padding: 10,
-    textAlign:'center',
-    alignItems:'center'
+    alignItems: 'center',
+  },
+  navText: {
+    fontSize: 11,
+    color: 'white',
   },
 });
 
