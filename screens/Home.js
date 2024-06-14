@@ -1,19 +1,17 @@
 import React, { useState,useEffect } from 'react';
 import { Image, View, Text, StyleSheet, ScrollView, TextInput,ImageBackground, TouchableOpacity, Pressable } from 'react-native'; // Import TextInput
 import { useNavigation } from "@react-navigation/native";
-import Icon from 'react-native-vector-icons/FontAwesome'; // Import the icon library
+import Icon from 'react-native-vector-icons/FontAwesome'; 
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '../firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import categoryData from '../assets/data/categories.json'
 
-// Define the SearchBar component
 const SearchBar = ({ placeholder, onSearch }) => {
   const [text, setText] = useState('');
 
   const handleChangeText = (value) => {
     setText(value);
-    // Call the onSearch function with the value parameter
     onSearch(value);
   };
 
@@ -196,7 +194,7 @@ const Home = () => {
 
   const handleSearch = (value) => {
     setSearchText(value);
-    // Do something with the search text, for example, filter data
+
   };
 
   return (
@@ -255,13 +253,13 @@ const styles = StyleSheet.create({
   navTop: {
     justifyContent: 'space-between',
     flexDirection: 'row',
-    alignItems: 'center', // Align items vertically
+    alignItems: 'center', 
   },
   profileImageContainer: {
     width: 40,
     height: 40,
-    borderRadius: 25, // Half of width and height for circular shape
-    overflow: 'hidden', // Clip the image to the container shape
+    borderRadius: 25, 
+    overflow: 'hidden', 
   },
   navProfileImg: {
     width: '100%',
@@ -295,7 +293,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 5,
-    marginTop: 20, // Add marginTop to create space between NavTop and SearchBar
+    marginTop: 20, 
   },
   searchIcon: {
     marginRight: 10,
@@ -325,7 +323,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 20,
-    backgroundColor: '#ffffff', // Ganti dengan gambar latar belakang
+    backgroundColor: '#ffffff', 
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -343,7 +341,7 @@ const styles = StyleSheet.create({
     textShadowColor : 'black',
     textAlign:'center',
     fontWeight: 'bold',
-    color: 'white', // Ganti dengan warna teks yang sesuai
+    color: 'white', 
   },
   eventContainer : {
     gap:10,
@@ -396,7 +394,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 20,
-    backgroundColor: '#ffffff', // Ganti dengan gambar latar belakang
+    backgroundColor: '#ffffff', 
     elevation: 5,
     justifyContent: 'center',
     alignItems: 'center',
@@ -406,14 +404,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'center',
     backgroundColor: '#ac1484',
-    padding: 5, // Padding horizontal untuk tombol
+    padding: 5,
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
     width: '100%',
     textAlign:'center',
-    zIndex: 999, // Menentukan navbar berada di layer terdepan
+    zIndex: 999, 
   },
   buttonNavDown: {
     padding: 10,

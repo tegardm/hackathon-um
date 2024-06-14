@@ -61,11 +61,9 @@ const SignUpForm = () => {
 
   const signUp = async (email, password, username, domisili) => {
     try {
-      // Create user with email and password
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
       console.log(user.email);
-      // Save the username in Firestore
       await setDoc(doc(db, 'users', user.uid), {
         Username: username,
         Email: email,
@@ -78,12 +76,8 @@ const SignUpForm = () => {
   
       console.log('User signed up and username saved');
     } catch (error) {
-      console.error('Error signing up:', error);
-    console.error("Error message:", error.message);
+    console.error('Error signing up:', error);
     console.error("Error code:", error.code);
-    console.error("Error details:", error.details);
-    console.error("Native error code:", error.nativeErrorCode);
-    console.error("Native error message:", error.nativeErrorMessage);
     }
   };
 

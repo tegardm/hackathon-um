@@ -105,7 +105,7 @@ const Login = () => {
       <Pressable
         style={styles.forgotPasswordContainer}
         onPress={() => {
-          // Add forgot password functionality
+          
         }}
       >
         {/* <Text style={styles.forgotPassword}>Forgot password?</Text> */}

@@ -1,9 +1,9 @@
 import * as React from "react";
 import { useState,useEffect } from 'react';
-import { Image, View, Text, StyleSheet, Linking, ScrollView, TextInput,ImageBackground, TouchableOpacity, Pressable } from 'react-native'; // Import TextInput
+import { Image, View, Text, StyleSheet, Linking, ScrollView, TextInput,ImageBackground, TouchableOpacity, Pressable } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import { Color, FontFamily, FontSize, Border } from "../GlobalStyles";
-import Icon from 'react-native-vector-icons/FontAwesome'; // Import the icon library
+import Icon from 'react-native-vector-icons/FontAwesome'; 
 import { signOut } from "firebase/auth";
 import {firebase, auth, db} from "../firebase"
 import { doc, getDoc } from 'firebase/firestore';
@@ -183,14 +183,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'center',
     backgroundColor: '#ac1484',
-    padding: 5, // Padding horizontal untuk tombol
+    padding: 5,
     position: 'absolute',
     bottom: -50,
     left: 0,
     right: 0,
     width: '100%',
     textAlign:'center',
-    zIndex: 999, // Menentukan navbar berada di layer terdepan
+    zIndex: 999, 
   },
   buttonNavDown: {
     padding: 10,
