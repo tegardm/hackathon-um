@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Image, View, Text, StyleSheet, ScrollView, TextInput,ImageBackground, TouchableOpacity, Pressable } from 'react-native'; 
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Border, FontFamily, Color, FontSize } from "../GlobalStyles";
 import Icon from 'react-native-vector-icons/FontAwesome'; 
-
+import { auth, db } from '../firebase';
+import { doc, getDoc, getDocs, collection } from 'firebase/firestore';
 
 const SearchBar = ({ placeholder, onSearch }) => {
   const [text, setText] = useState('');
-
   const handleChangeText = (value) => {
     setText(value);
     // Call the onSearch function with the value parameter
@@ -29,7 +29,10 @@ const SearchBar = ({ placeholder, onSearch }) => {
 };
 
 
-const EventCard = ({title}) => {
+
+
+const EventCard = ({ judul, deskripsi, lokasi, jarak, lat, long }) => {
+  const navigation = useNavigation()
   const randomImageUrl = `https://random.danielpetrica.com/api/random?ref=danielpetrica.com&${new Date().getTime()}`;
 
   return (
@@ -44,17 +47,16 @@ const EventCard = ({title}) => {
         </ImageBackground>
       </View>
       <View>
-        <Text style={styles.eventTitle}>{title ? `UMKM ${title}` : 'Nama UMKM'}</Text>
+        <Text style={styles.eventTitle}>{judul ? `UMKM ${judul}` : 'Nama UMKM'}</Text>
         <Text style={styles.eventDesc}>
-            Ini berisikan deskripsi dari UMKM yang dituliskan oleh pelaku UMKM yang sudah terverifikasi
-            oleh tim administrator EventaStand 
+            {deskripsi}
             </Text>
 
         
         <View style={styles.dateDistance}>
         <Text style={styles.eventDate}>
-        <Icon name="location-arrow" size={12} color="gray" style={styles.searchIcon} /> Malang</Text>
-          <Text style={styles.eventDistance}>2.4 Km</Text>
+        <Icon name="location-arrow" size={12} color="gray" style={styles.searchIcon} /> {lokasi}</Text>
+          <Text style={styles.eventDistance}>{jarak} Km</Text>
         </View>
       </View>
     </View>
@@ -93,11 +95,80 @@ const NearbyUMKM = () => {
 
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState('');
+  const [eventData,setEventData] = useState([])
+  const [userdata,setUserData] = useState({})
+
+  const calculateDistance = (userLat, userLng, itemLat, itemLng) => {
+    const earthRadiusKm = 6371;
+    const dLat = degreesToRadians(itemLat - userLat);
+    const dLng = degreesToRadians(itemLng - userLng);
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(degreesToRadians(userLat)) * Math.cos(degreesToRadians(itemLat)) *
+      Math.sin(dLng / 2) * Math.sin(dLng / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = earthRadiusKm * c;
+
+    return distance;
+  };
+
+  const degreesToRadians = (degrees) => {
+    return degrees * (Math.PI / 180);
+  };
+
+useEffect(() => {
+  const fetchUserData = async () => {
+    try {
+      const user = auth.currentUser;
+      if (user) {
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          setUserData(data);
+          const userLat = data.location.latitude;
+          const userLng = data.location.longitude;
+
+          const dataDocRef = await getDocs(collection(db, 'umkms'));
+          const docsData = dataDocRef.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+            distance: calculateDistance(userLat, userLng, doc.data().Cordinate.latitude, doc.data().Cordinate.longitude)
+          }));
+          setEventData(docsData);
+        } else {
+          setError('No user data found.');
+        }
+      } else {
+        setError('No user is signed in.');
+      }
+    } catch (error) {
+      console.error('Error fetching user data: ', error);
+      setError('Failed to fetch user data.');
+    }
+  };
+
+  fetchUserData();
+}, []);
+
+
+  const formatDate = (firebaseTimestamp) => {
+    const date = firebaseTimestamp.toDate(); // Konversi Firebase Timestamp ke Date
+    const options = { year: 'numeric', month: 'long', day: 'numeric'};
+    return date.toLocaleDateString(undefined, options);
+  };
 
   const handleSearch = (value) => {
     setSearchText(value);
     // Do something with the search text, for example, filter data
   };
+
+  const filteredEvents = eventData.filter(event => 
+    event.Name.toLowerCase().includes(searchText.toLowerCase()) ||
+    event.Description.toLowerCase().includes(searchText.toLowerCase())
+  );
   return (
     <View>
       <View style={styles.container}>
@@ -113,14 +184,23 @@ const NearbyUMKM = () => {
         <Text style={styles.acaraRibbon}>{text ? `UMKM Dengan Kategori ${text}` : 'UMKM sekitar Anda'}</Text>
         </View>
         <ScrollView vertical showsVerticalScrollIndicator={false}>
-        <View style={styles.eventContainer}>
-          <EventCard title={text}/>
-          <EventCard title={text}/>
-          <EventCard title={text}/>
-          <EventCard title={text}/>
-          <EventCard title={text}/>
-          <EventCard title={text}/>
-
+       
+        <View style={{ flex: 1 ,marginBottom:150}}>
+            {filteredEvents.length > 0 ? (
+              filteredEvents.map((item) => (
+                <EventCard
+                  key={item.id.toString()}
+                  judul={item.Name}
+                  deskripsi={item.Description}
+                  lokasi={item.Location}
+                  jarak={item.distance.toFixed(2)}
+                  lat={item.Cordinate.latitude}
+                  long={item.Cordinate.longitude}
+                />
+              ))
+            ) : (
+              <Text style={styles.noEventsText}>No UMKM Found.</Text>
+            )}
           </View>
           </ScrollView>
 
@@ -133,6 +213,7 @@ const NearbyUMKM = () => {
 
 const styles = StyleSheet.create({
   container: {
+    minHeight:'100%',
     paddingVertical: 40,
     // paddingHorizontal: 20,
     alignItems:'center'
@@ -235,19 +316,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   
+
   containerNavDown: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
     backgroundColor: '#ac1484',
-    padding: 5, // Padding horizontal untuk tombol
+    padding: 5,
     position: 'absolute',
-    bottom:195,
+    bottom: 0,
     left: 0,
     right: 0,
     width: '100%',
-    textAlign:'center',
-    zIndex: 999, // Menentukan navbar berada di layer terdepan
+    zIndex: 999,
   },
   buttonNavDown: {
     padding: 10,

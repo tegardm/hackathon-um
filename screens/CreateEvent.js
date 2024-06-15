@@ -5,7 +5,7 @@ import RNPickerSelect from 'react-native-picker-select';
 import MapView, { Marker } from 'react-native-maps';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { auth, db } from '../firebase';
-import { doc,addDoc, getDoc, collection } from 'firebase/firestore';;
+import { doc,addDoc, getDoc, collection } from 'firebase/firestore';
 import categoriesData from '../assets/data/categories.json'
 import MultiSelect from 'react-native-multiple-select';
 

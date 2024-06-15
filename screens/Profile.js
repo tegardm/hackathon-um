@@ -14,7 +14,7 @@ const ProfileButton = ({text, address}) => {
   const handlePress = () => {
     if (address && typeof address === 'string') {
      
-        navigation.navigate(address);
+        navigation.replace(address);
        
     } else {
       console.warn('Invalid address:', address);

@@ -93,13 +93,19 @@ const EventCard = ({ judul, deskripsi, lokasi, tanggal, jarak, lat, long }) => {
         <View>
           <Text style={styles.eventTitle}>{judul}</Text>
           <Text style={styles.eventDesc}>{deskripsi}</Text>
-          <Text style={styles.eventCity}>
-            <Icon name="location-arrow" size={12} color="gray" style={styles.searchIcon} /> {lokasi}</Text>
+          
           <View style={styles.dateDistance}>
             <Text style={styles.eventDate}>
-              <Icon padding={15} name="clock-o" size={12} color="gray" style={styles.searchIcon} />{tanggal}</Text>
-            <Text style={styles.eventDistance}>{jarak} Km</Text>
+              <Icon padding={15} name="clock-o" size={12} color="gray" style={styles.searchIcon} />{' '+tanggal}
+              </Text>
+              <Text style={styles.eventDistance}>{jarak} Km</Text>
+
           </View>
+         
+          <Text style={styles.eventCity}>
+            <Icon name="location-arrow" size={12} color="gray" style={styles.searchIcon} /> {lokasi}
+            </Text>
+          
         </View>
       </View>
     </Pressable>
@@ -193,15 +199,25 @@ const Home = () => {
     fetchUserData();
   }, []);
 
-  const handleSearch = useCallback((value) => {
-    setSearchText(value);
-  }, []);
+
 
   const filteredEvents = eventData.filter(event => 
     event.EventName.toLowerCase().includes(searchText.toLowerCase()) ||
     event.EventDescription.toLowerCase().includes(searchText.toLowerCase())
   );
+
+    const handleSearch = useCallback((value) => {
+    setSearchText(value);
+  }, []);
+  
   const navigation = useNavigation();
+
+
+  const formatDate = (firebaseTimestamp) => {
+    const date = firebaseTimestamp.toDate(); // Konversi Firebase Timestamp ke Date
+    const options = { year: 'numeric', month: 'long', day: 'numeric'};
+    return date.toLocaleDateString(undefined, options);
+  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -241,14 +257,14 @@ const Home = () => {
                   judul={item.EventName}
                   deskripsi={item.EventDescription}
                   lokasi={item.Location}
-                  tanggal={""}
+                  tanggal={formatDate(item.RegistrationEnd)}
                   jarak={item.distance.toFixed(2)}
                   lat={item.Cordinate.latitude}
                   long={item.Cordinate.longitude}
                 />
               ))
             ) : (
-              <Text style={styles.noEventsText}>No events found.</Text>
+              <Text style={styles.noEventsText}>No Events Found.</Text>
             )}
           </View>
         </View>
@@ -367,7 +383,7 @@ const styles = StyleSheet.create({
   eventCardContainer : {
     flexDirection:'row',
     gap:15,
-    paddingBottom : 10,
+    paddingVertical : 10,
     borderBottomWidth:1,
     borderBottomColor:'lightgray'
   },
@@ -379,7 +395,8 @@ const styles = StyleSheet.create({
   eventCity : {
     color : 'gray',
     fontSize : 12,
-    width:250
+    width:250,
+    marginTop:5
   },
   eventDesc : {
     color : 'gray',
