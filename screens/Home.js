@@ -76,12 +76,12 @@ const Category = ({ text }) => {
   );
 };
 
-const EventCard = ({ judul, deskripsi, lokasi, tanggal, jarak, lat, long }) => {
+const EventCard = ({idevent, judul, deskripsi, lokasi, tanggal, jarak, lat, long }) => {
   const navigation = useNavigation();
   const randomImageUrl = `https://random.danielpetrica.com/api/random?ref=danielpetrica.com&${new Date().getTime()}`;
 
   return (
-    <Pressable onPress={() => navigation.replace('DetailEvent')}>
+    <Pressable onPress={() => navigation.navigate('DetailEvent', {uid: idevent})}>
       <View style={styles.eventCardContainer}>
         <View>
           <ImageBackground
@@ -254,6 +254,7 @@ const Home = () => {
               filteredEvents.map((item) => (
                 <EventCard
                   key={item.id.toString()}
+                  idevent={item.id}
                   judul={item.EventName}
                   deskripsi={item.EventDescription}
                   lokasi={item.Location}

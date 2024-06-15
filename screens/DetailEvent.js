@@ -1,9 +1,38 @@
 import { useNavigation } from '@react-navigation/core';
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Linking, SafeAreaView } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
+import { auth, db } from '../firebase';
+import { doc, getDoc, getDocs, collection } from 'firebase/firestore';
 
-const EventDetail = () => {
+const EventDetail = ({route}) => {
+  const { uid } = route.params;
+  console.log("Event ID:", uid);
+  const [event, setEvent] = useState(null);
+  
+  useEffect(() => {
+    const fetchEvent = async () => {
+      try {
+        const docRef = doc(db, 'events', uid);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const eventData = await docSnap.data();
+          setEvent(eventData);
+          console.log("Data fetch success");
+          console.log("Data:", event);
+        } else {
+          console.log('No such document!');
+        }
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching document: ', error);
+      }
+    };
+
+    fetchEvent();
+  }, [uid]);
+
   const eventDetails = {
     thumbnail: `https://random.danielpetrica.com/api/random?ref=danielpetrica.com&${new Date().getTime()}`,
     name: 'Nama Event',
@@ -18,8 +47,8 @@ const EventDetail = () => {
     endTime: '04:00 PM',
     umkmApplyDeadline: '2024-06-15',
     region : {
-      latitude: -6.200000,
-      longitude: 106.816666,
+      latitude: 0,
+      longitude: 0,
       latitudeDelta: 0.0922,
       longitudeDelta: 0.0421,
     }
@@ -37,17 +66,17 @@ const EventDetail = () => {
           <TouchableOpacity onPress={() => navigation.navigate('Home')} style={styles.backButton}>
           <Image source={require('../assets/vector-7.png')} style={styles.backIcon} />
         </TouchableOpacity>
-          <Text style={styles.headerTitle}>{eventDetails.name}</Text>
+          <Text style={styles.headerTitle}>{event.EventName}</Text>
         </View>
         <View style={styles.detailsContainer}>
-          <Text style={styles.description}>{eventDetails.description}</Text>
+          <Text style={styles.description}>{event.EventDescription}</Text>
           <View style={styles.infoContainer}>
             <Text style={styles.label}>Kategori:</Text>
             <Text style={styles.value}>{eventDetails.category}</Text>
           </View>
           <View style={styles.infoContainer}>
             <Text style={styles.label}>Publisher:</Text>
-            <Text style={styles.value}>{eventDetails.author}</Text>
+            <Text style={styles.value}>{event.Username}</Text>
           </View>
           <View style={styles.infoContainer}>
             <Text style={styles.label}>Tanggal Acara:</Text>
@@ -55,7 +84,7 @@ const EventDetail = () => {
           </View>
           <View style={styles.infoContainer}>
             <Text style={styles.label}>Alamat Lokasi:</Text>
-            <Text style={styles.value}>{eventDetails.location}</Text>
+            <Text style={styles.value}>{event.Location}</Text>
           </View>
           <View style={styles.infoContainer}>
             <Text style={styles.label}>Waktu Jam Acara:</Text>
@@ -80,7 +109,7 @@ const EventDetail = () => {
         </View>
       </ScrollView>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={() => alert('Apply button pressed')}>
+        <TouchableOpacity style={styles.button} onPress={() => Linking.openURL(`https://www.google.com/maps?q=${event.Cordinate.latitude},${event.Cordinate.longitude}`)}>
           <Text style={styles.buttonText}>Lihat Map</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Chat')}>
