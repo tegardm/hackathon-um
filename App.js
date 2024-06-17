@@ -19,6 +19,7 @@ import Saved from "./screens/Saved";
 import UploadUMKM from "./screens/UploadUMKM";
 import UploadReview from "./screens/UploadReview";
 import DetailEvent from "./screens/DetailEvent";
+import DetailUMKM from "./screens/DetailUMKM";
 import AprovedEvent from "./screens/AprovedEvent";
 import NearbyUMKM from "./screens/NearbyUMKM";
 import Chat from "./screens/Chat";
@@ -136,6 +137,11 @@ const App = () => {
             <Stack.Screen
               name="DetailEvent"
               component={DetailEvent}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="DetailUMKM"
+              component={DetailUMKM}
               options={{ headerShown: false }}
             />
             <Stack.Screen

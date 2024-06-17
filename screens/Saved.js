@@ -26,16 +26,16 @@ const SearchBar = ({ placeholder, onSearch }) => {
   );
 };
 
-const EventCard = ({ judul, deskripsi, lokasi, tanggal, jarak, lat, long }) => {
+const EventCard = ({ idevent,judul, deskripsi, lokasi, tanggal, jarak, lat, long,url}) => {
   const navigation = useNavigation();
   const randomImageUrl = `https://random.danielpetrica.com/api/random?ref=danielpetrica.com&${new Date().getTime()}`;
-
+  const imgUrl = url ? url : randomImageUrl
   return (
-    <Pressable onPress={() => navigation.replace('DetailEvent')}>
+    <Pressable onPress={() => navigation.navigate('DetailEvent', {uid: idevent})}>
       <View style={styles.eventCardContainer}>
         <View>
           <ImageBackground
-            source={{ uri: randomImageUrl }}
+            source={{ uri: imgUrl }}
             style={styles.boxEvent}
             imageStyle={{ borderRadius: 20 }}>
           </ImageBackground>
@@ -117,7 +117,7 @@ const Saved = () => {
       try {
         const user = auth.currentUser;
         if (user) {
-          const userDocRef = doc(db, 'users', user.uid);
+          const userDocRef = await doc(db, 'users', user.uid);
           const userDoc = await getDoc(userDocRef);
           if (userDoc.exists()) {
             const data = userDoc.data();
@@ -179,6 +179,7 @@ const Saved = () => {
           {filteredEvents.length > 0 ? (
             filteredEvents.map((item) => (
               <EventCard
+              idevent={item.id}
                 key={item.id.toString()}
                 judul={item.EventName}
                 deskripsi={item.EventDescription}
@@ -187,6 +188,7 @@ const Saved = () => {
                 jarak={item.distance.toFixed(2)}
                 lat={item.Cordinate.latitude}
                 long={item.Cordinate.longitude}
+                url={item.ImageUrl}
               />
             ))
           ) : (

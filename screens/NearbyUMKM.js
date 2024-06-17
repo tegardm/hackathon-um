@@ -31,12 +31,12 @@ const SearchBar = ({ placeholder, onSearch }) => {
 
 
 
-const EventCard = ({ judul, deskripsi, lokasi, jarak, lat, long }) => {
+const EventCard = ({  idEvent, judul, deskripsi, lokasi, jarak, lat, long }) => {
   const navigation = useNavigation()
   const randomImageUrl = `https://random.danielpetrica.com/api/random?ref=danielpetrica.com&${new Date().getTime()}`;
 
   return (
-    <Pressable onPress={() => navigation.navigate('DetailEvent')}>
+    <Pressable onPress={() => navigation.navigate('DetailUMKM',{uid:idEvent})}>
 
     <View style={styles.eventCardContainer}>
       <View>
@@ -139,14 +139,14 @@ useEffect(() => {
           }));
           setEventData(docsData);
         } else {
-          setError('No user data found.');
+          // setError('No user data found.');
         }
       } else {
-        setError('No user is signed in.');
+        // setError('No user is signed in.');
       }
     } catch (error) {
       console.error('Error fetching user data: ', error);
-      setError('Failed to fetch user data.');
+      // setError('Failed to fetch user data.');
     }
   };
 
@@ -196,6 +196,7 @@ useEffect(() => {
                   jarak={item.distance.toFixed(2)}
                   lat={item.Cordinate.latitude}
                   long={item.Cordinate.longitude}
+                  idEvent = {item.id}
                 />
               ))
             ) : (

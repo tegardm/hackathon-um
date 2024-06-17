@@ -66,7 +66,7 @@ const EventDetail = ({ route }) => {
   };
 
   const eventDetails = {
-    thumbnail: `https://random.danielpetrica.com/api/random?ref=danielpetrica.com&${new Date().getTime()}`,
+    thumbnail: event.ImageUrl || `https://random.danielpetrica.com/api/random?ref=danielpetrica.com&${new Date().getTime()}`,
     name: event.EventName || 'Nama Event',
     description: event.EventDescription || 'Deskripsi event yang sangat menarik dan informatif.',
     category: event.Category || 'Kategori Event',

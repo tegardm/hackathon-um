@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { Image, Button, View, Text, StyleSheet, Linking, ScrollView, TextInput, ImageBackground, TouchableOpacity, Pressable } from 'react-native';
+import { Image, Button, View, Text, StyleSheet, Linking, Alert, ScrollView, TextInput, ImageBackground, TouchableOpacity, Pressable } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import RNPickerSelect from 'react-native-picker-select';
 import MapView, { Marker } from 'react-native-maps';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { auth, db } from '../firebase';
+import app,{ auth, db, storage } from '../firebase';
 import { doc,addDoc, getDoc, collection } from 'firebase/firestore';
 import categoriesData from '../assets/data/categories.json'
 import MultiSelect from 'react-native-multiple-select';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import * as ImagePicker from 'expo-image-picker';
+import { getAuth } from 'firebase/auth';
+import * as FileSystem from 'expo-file-system'
 
 
 
@@ -45,6 +49,9 @@ const CreateEvent = () => {
   const [userId,setUserId] = useState('')
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [isMap, setIsMap] = useState(true)
+  const [image, setImage] = useState('');
+  const [uploading,setUploading] = useState(false)
+  const [imageUrl,setImageUrl] = useState('')
   useEffect(() => {
     const data = categoriesData.map((category, index) => ({
       label: category.title,
@@ -87,41 +94,115 @@ const CreateEvent = () => {
 
   },[])
 
-  const handleImagePick = () => {
-    // Handle image picking logic here
-  };
+
 
   const handleFilePick = () => {
     // Handle file picking logic here
   };
 
-  const handleSubmit = async () => {
-    
+  const handleImageUpload = async () => {
+    try {
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permissionResult.granted) {
+        Alert.alert('Permission denied', 'You need to grant access to photos to use this feature.');
+        return;
+      }
 
-    const newEvent = {
-      UserId : userId,
-      Username : username,
-      EventName : eventName,
-      EventDescription : eventDescription,
-      Categories : selectedCategories,
-      EventDateStart : eventDateStart,
-      EventDateEnd : eventDateEnd,
-      Location : location,
-      Link : link,
-      StartTime : startTime,
-      EndTime : endTime,
-      RegistrationEnd : registrationEnd,
-      IsChecked : isChecked,
-      Cordinate : {latitude : region.latitude, longitude : region.longitude}
+      const pickerResult = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
 
+      if (!pickerResult.cancelled) {
+        setImage(pickerResult['assets'][0]['uri']);
+        console.log(pickerResult['assets'][0]['uri']);
+      }
+    } catch (error) {
+      console.error('Error picking image: ', error);
     }
+  };
 
-    const docRef = await addDoc(collection(db, 'events'), newEvent);
 
-    // console.log('Document written with ID:', docRef.id);
-    navigation.navigate('UploadReview');
-    // console.log(newEvent);
+
+const uploadImage = async () => {
+  if (!image) {
+    Alert.alert('No image selected', 'Please select an image to upload.');
+    return;
   }
+
+  setUploading(true); // Set uploading state for UI feedback (optional)
+
+  try {
+    console.log('Fetching image from URI:', image);
+    const response = await fetch(image); // Fetch the image data using the URI
+    const blob = await response.blob(); // Convert to a blob for upload
+
+    console.log('Image fetched and converted to blob:', blob);
+
+    const filename = image.substring(image.lastIndexOf('/') + 1); // Extract filename
+    const storageRef = ref(storage, `images/${filename}`); // Get reference to the storage location
+
+    console.log('Uploading image to Firebase Storage:', filename);
+    const snapshot = await uploadBytes(storageRef, blob); // Upload the blob to Firebase Storage
+
+    console.log('Upload successful, getting download URL...');
+    const downloadURL = await getDownloadURL(snapshot.ref); // Get download URL of the uploaded image
+    setImageUrl(downloadURL.toString())
+    console.log('Download URL obtained:', downloadURL.toString());
+    const data = downloadURL.toString()
+    setUploading(false); // Reset uploading state (optional)
+    Alert.alert('Photo Uploaded!');
+    // setImage(null); // Clear the selected image state
+    return data;
+  } catch (error) {
+    console.error('Upload Error:', error);
+    setUploading(false); // Reset uploading state (optional)
+    Alert.alert('Upload Failed', 'An error occurred while uploading the image.');
+    return false;
+  }
+};
+
+  
+  
+  
+  
+  
+
+
+  const handleSubmit = async () => {
+    try {
+
+      const sourceImg = await uploadImage()
+      const newEvent = {
+        UserId : userId,
+        Username : username,
+        EventName : eventName,
+        EventDescription : eventDescription,
+        Categories : selectedCategories,
+        EventDateStart : eventDateStart,
+        EventDateEnd : eventDateEnd,
+        Location : location,
+        Link : link,
+        StartTime : startTime,
+        EndTime : endTime,
+        RegistrationEnd : registrationEnd,
+        IsChecked : isChecked,
+        Cordinate : {latitude : region.latitude, longitude : region.longitude},
+        ImageUrl :  sourceImg // Pastikan imageUrl diisi dengan nilai yang diperoleh dari Firebase Storage
+      };
+  
+      const docRef = await addDoc(collection(db, 'events'), newEvent);
+      console.log('Document written with ID:', docRef.id);
+  
+      navigation.navigate('UploadReview');
+    } catch (error) {
+      console.error('Error handling submit:', error);
+      // Handle error
+    }
+  };
+  
 
   const showDatePicker = (type) => {
     setShowEventDatePickerStart(type === 'eventDateStart');
@@ -309,7 +390,8 @@ onChangeText={setEventName}
     )}
 
     <Text style={styles.label}>Upload Thumbnail (image)</Text>
-    <TouchableOpacity style={styles.button} onPress={handleImagePick}>
+    <TouchableOpacity style={styles.button} onPress={handleImageUpload}>
+    {image && <Image source={{ uri: image }} style={styles.image} />}
       <Text style={styles.buttonText}>Unggah Gambar Sebagai Thumbnail Postingan</Text>
     </TouchableOpacity>
 
@@ -387,6 +469,11 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingHorizontal: 10,
     borderRadius: 5,
+  },
+  image: {
+    width: 200,
+    height: 200,
+    marginTop: 20,
   },
   dateButton: {
     height: 40,
