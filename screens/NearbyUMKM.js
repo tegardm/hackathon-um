@@ -50,7 +50,7 @@ const EventCard = ({  idEvent, judul, deskripsi, lokasi, lat, long , url, jarak}
       <View>
         <Text style={styles.eventTitle}>{judul ? `UMKM ${judul}` : 'Nama UMKM'}</Text>
         <Text style={styles.eventDesc}>
-            {deskripsi}
+            {deskripsi.substring(0,75)+'...'}
             </Text>
 
         

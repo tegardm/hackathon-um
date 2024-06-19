@@ -92,7 +92,7 @@ const EventCard = ({idevent, judul, deskripsi, lokasi, tanggal, jarak, lat, long
         </View>
         <View>
           <Text style={styles.eventTitle}>{judul}</Text>
-          <Text style={styles.eventDesc}>{deskripsi}</Text>
+          <Text style={styles.eventDesc}>{deskripsi.substring(0,75)+'...'}</Text>
           
           <View style={styles.dateDistance}>
             <Text style={styles.eventDate}>
@@ -391,7 +391,7 @@ const styles = StyleSheet.create({
   },
   eventContainer : {
     gap:10,
-    paddingBottom:120
+    paddingBottom:120,
 
   },
   eventCardContainer : {
@@ -402,9 +402,11 @@ const styles = StyleSheet.create({
     borderBottomColor:'lightgray'
   },
   eventTitle : {
-    fontSize :18,
+    fontSize :15,
     marginBottom:5,
-    fontWeight : 'bold'
+    fontWeight : 'bold',
+    marginRight:15,
+    width:230,
   },
   eventCity : {
     color : 'gray',

@@ -42,7 +42,7 @@ const EventCard = ({ idevent,judul, deskripsi, lokasi, tanggal, jarak, lat, long
         </View>
         <View>
           <Text style={styles.eventTitle}>{judul}</Text>
-          <Text style={styles.eventDesc}>{deskripsi}</Text>
+          <Text style={styles.eventDesc}>{deskripsi.substring(0,75)+'...'}</Text>
           <View style={styles.dateDistance}>
             <Text style={styles.eventDate}>
               <Icon padding={15} name="clock-o" size={12} color="gray" style={styles.searchIcon} />{' ' + tanggal}
