@@ -69,7 +69,7 @@ const EventDetail = ({ route }) => {
     thumbnail: event.ImageUrl || `https://random.danielpetrica.com/api/random?ref=danielpetrica.com&${new Date().getTime()}`,
     name: event.EventName || 'Nama Event',
     description: event.EventDescription || 'Deskripsi event yang sangat menarik dan informatif.',
-    category: event.Category || 'Kategori Event',
+    category: event.Categories || 'Kategori Event',
     author: event.Username || 'Publisher',
     startDate: event.EventDateStart ? formatDate(event.EventDateStart) : 'Invalid date',
     endDate: event.EventDateEnd ? formatDate(event.EventDateEnd) : 'Invalid date',
@@ -101,7 +101,9 @@ const EventDetail = ({ route }) => {
           <Text style={styles.description}>{eventDetails.description}</Text>
           <View style={styles.infoContainer}>
             <Text style={styles.label}>Kategori:</Text>
-            <Text style={styles.value}>{eventDetails.category}</Text>
+            <Text style={styles.value}>
+                    {eventDetails.category.slice(0, 3).filter(Boolean).join(', ')}
+              </Text>
           </View>
           <View style={styles.infoContainer}>
             <Text style={styles.label}>Publisher:</Text>

@@ -56,7 +56,7 @@ const DetailUMKM = ({ route }) => {
       thumbnail: event?.ImageUrl || `https://random.danielpetrica.com/api/random?ref=danielpetrica.com&${new Date().getTime()}`,
       name: event?.Name || 'Nama Event',
       description: event?.Description || 'Deskripsi event yang sangat menarik dan informatif.',
-      category: event?.Category || 'Kategori Event',
+      category: event?.Categories || 'Kategori Event',
       author: event?.Username || 'Publisher',
       location: event?.Location || 'Jl. Contoh Alamat No. 123, Kota Contoh',
       moreInfoLink: event?.Link || 'https://info-lebih-lanjut.com',
@@ -83,7 +83,9 @@ const DetailUMKM = ({ route }) => {
             <Text style={styles.description}>{eventDetails.description}</Text>
             <View style={styles.infoContainer}>
               <Text style={styles.label}>Kategori:</Text>
-              <Text style={styles.value}>{eventDetails.category}</Text>
+              <Text style={styles.value}>
+                    {eventDetails.category.slice(0, 3).filter(Boolean).join(', ')}
+              </Text>
             </View>
             <View style={styles.infoContainer}>
               <Text style={styles.label}>Publisher:</Text>
