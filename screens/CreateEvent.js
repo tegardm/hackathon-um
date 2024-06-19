@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Image, Button, View, Text, StyleSheet, Linking, Alert, ScrollView, TextInput, ImageBackground, TouchableOpacity, Pressable } from 'react-native';
+import { Image, Button, View, Text, StyleSheet, Linking, LogBox ,Alert,FlatList , ScrollView, TextInput, ImageBackground, TouchableOpacity, Pressable } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import RNPickerSelect from 'react-native-picker-select';
 import MapView, { Marker } from 'react-native-maps';
@@ -14,6 +14,7 @@ import { getAuth } from 'firebase/auth';
 import * as FileSystem from 'expo-file-system'
 
 
+LogBox.ignoreLogs(['VirtualizedLists should never be nested inside plain ScrollViews']);
 
 const CreateEvent = () => { 
 
@@ -123,9 +124,6 @@ const CreateEvent = () => {
       console.error('Error picking image: ', error);
     }
   };
-
-
-
 const uploadImage = async () => {
   if (!image) {
     Alert.alert('No image selected', 'Please select an image to upload.');
@@ -163,12 +161,6 @@ const uploadImage = async () => {
     return false;
   }
 };
-
-  
-  
-  
-  
-  
 
 
   const handleSubmit = async () => {
@@ -255,14 +247,18 @@ const uploadImage = async () => {
           <Text style={styles.notifTitle}>Buat Postingan Acara / Event</Text>
         </View>
         
+        <View>
         <Text style={styles.label}>Nama Event</Text>
         <TextInput
           style={styles.input}     
-placeholder="NamaEvent"
-value={eventName}
-onChangeText={setEventName}
-/>
-<Text style={styles.label}>Deskripsi Event</Text>
+          placeholder="NamaEvent"
+          value={eventName}
+          onChangeText={setEventName}
+          />
+        </View>
+        <View>
+          
+    <Text style={styles.label}>Deskripsi Event</Text>
     <TextInput
       style={styles.textArea}
       placeholder="Deskripsi Event"
@@ -270,6 +266,7 @@ onChangeText={setEventName}
       onChangeText={setEventDescription}
       multiline
     />
+        </View>
         <View style={styles.categoryContainer}>
           <Text  style={[styles.label,{marginBottom:15}]}>Kategori</Text>
           <MultiSelect
@@ -292,7 +289,8 @@ onChangeText={setEventName}
             submitButtonColor="#ac1484"
           />
         </View>
-
+    <View>
+      
     <Text style={styles.label}>Tanggal Awal</Text>
     <TouchableOpacity onPress={() => showDatePicker('eventDateStart')} style={styles.dateButton}>
       <Text style={styles.dateText}>{eventDateStart.toDateString()}</Text>
@@ -305,8 +303,10 @@ onChangeText={setEventName}
         onChange={(event, date) => handleDateChange('eventDateStart', event, date)}
       />
     )}
+    </View>
 
-    <Text style={styles.label}>Tanggal Akhir</Text>
+   <View>
+   <Text style={styles.label}>Tanggal Akhir</Text>
     <TouchableOpacity onPress={() => showDatePicker('eventDateEnd')} style={styles.dateButton}>
       <Text style={styles.dateText}>{eventDateEnd.toDateString()}</Text>
     </TouchableOpacity>
@@ -318,7 +318,9 @@ onChangeText={setEventName}
         onChange={(event, date) => handleDateChange('eventDateEnd', event, date)}
       />
     )}
+   </View>
 
+    <View>
     <Text style={styles.label}>Alamat Lokasi</Text>
     <TextInput
       style={styles.input}
@@ -326,8 +328,10 @@ onChangeText={setEventName}
       value={location}
       onChangeText={setLocation}
     />
+    </View>
 
-      <Text style={[styles.label,{fontSize:9,paddingBottom:5,fontWeight:'normal'}]}>Kordinat Lokasi (Tutup Map Sebelum Memasukan Data Lain Agar Menghindari Bug)</Text>
+     <View>
+     <Text style={[styles.label,{fontSize:9,paddingBottom:5,fontWeight:'normal'}]}>Kordinat Lokasi (Tutup Map Sebelum Memasukan Data Lain Agar Menghindari Bug)</Text>
       <TouchableOpacity style={styles.button} onPress={() => setIsMap(!isMap)}>
       <Text style={styles.buttonText}>{isMap ? 'Buka Map' : "Tutup Map"}</Text>
     </TouchableOpacity>
@@ -340,8 +344,10 @@ onChangeText={setEventName}
         <Marker coordinate={{ latitude: region.latitude, longitude: region.longitude }} />
       </MapView>
     </View>
+     </View>
 
 
+    <View>
     <Text style={styles.label}>Tautan (Link Social Media / Tautan Lebih Lanjut)</Text>
     <TextInput
       style={styles.input}
@@ -349,8 +355,10 @@ onChangeText={setEventName}
       value={link}
       onChangeText={setLink}
     />
+    </View>
 
-    <Text style={styles.label}>Waktu Mulai</Text>
+   <View>
+   <Text style={styles.label}>Waktu Mulai</Text>
     <TouchableOpacity onPress={() => showDatePicker('startTime')} style={styles.dateButton}>
       <Text style={styles.dateText}>{startTime.toLocaleTimeString()}</Text>
     </TouchableOpacity>
@@ -362,7 +370,9 @@ onChangeText={setEventName}
         onChange={(event, time) => handleDateChange('startTime', event, time)}
       />
     )}
+   </View>
 
+    <View>
     <Text style={styles.label}>Waktu Selesai</Text>
     <TouchableOpacity onPress={() => showDatePicker('endTime')} style={styles.dateButton}>
       <Text style={styles.dateText}>{endTime.toLocaleTimeString()}</Text>
@@ -375,7 +385,9 @@ onChangeText={setEventName}
         onChange={(event, time) => handleDateChange('endTime', event, time)}
       />
     )}
+    </View>
 
+    <View>
     <Text style={styles.label}>Tanggal Akhir Registrasi</Text>
     <TouchableOpacity onPress={() => showDatePicker('registrationEnd')} style={styles.dateButton}>
       <Text style={styles.dateText}>{registrationEnd.toDateString()}</Text>
@@ -388,7 +400,9 @@ onChangeText={setEventName}
         onChange={(event, date) => handleDateChange('registrationEnd', event, date)}
       />
     )}
+    </View>
 
+    <View>
     <Text style={styles.label}>Upload Thumbnail (image)</Text>
     <TouchableOpacity style={styles.button} onPress={handleImageUpload}>
     {image && <Image source={{ uri: image }} style={styles.image} />}
@@ -420,6 +434,7 @@ onChangeText={setEventName}
       <Text style={styles.labelCheck}>Saya menyetujui kebijakan aplikasi EventaStand dan siap 
         bertanggung jawab atas semua informasi saya.
       </Text>
+    </View>
     </View>
   </ScrollView>
   <TouchableOpacity onPress={handleSubmit} style={[styles.button, 
@@ -471,7 +486,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   image: {
-    width: 200,
+    width: 300,
     height: 200,
     marginTop: 20,
   },

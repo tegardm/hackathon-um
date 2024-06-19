@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Image, View, Text, ScrollView, TextInput, ImageBackground, StyleSheet,TouchableOpacity, FlatList, Pressable } from 'react-native'; 
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation,useRoute } from "@react-navigation/native";
 import Icon from 'react-native-vector-icons/FontAwesome'; 
 import { auth, db } from '../firebase';
 import { doc, getDoc, getDocs, collection } from 'firebase/firestore';
@@ -143,6 +143,8 @@ const Home = () => {
   const [eventData, setEventData] = useState([]);
   const [error, setError] = useState(null);
   const [searchText, setSearchText] = useState('');
+  const route = useRoute();
+  const { text = '' } = route.params || {};
 
   const calculateDistance = (userLat, userLng, itemLat, itemLng) => {
     const earthRadiusKm = 6371;
@@ -201,10 +203,20 @@ const Home = () => {
 
 
 
-  const filteredEvents = eventData.filter(event => 
-    event.EventName.toLowerCase().includes(searchText.toLowerCase()) ||
-    event.EventDescription.toLowerCase().includes(searchText.toLowerCase())
-  );
+  const filteredEvents = eventData.filter(event => {
+    const matchesSearchText = event.EventName.toLowerCase().includes(searchText.toLowerCase()) ||
+                              event.EventDescription.toLowerCase().includes(searchText.toLowerCase());
+  
+    if (text) {
+      const matchesCategory = event.Categories.some(category => category.toLowerCase().includes(text.toLowerCase()));
+      return matchesSearchText && matchesCategory;
+    }
+  
+    return matchesSearchText;
+  });
+
+  const sortedEvents = filteredEvents.sort((a, b) => a.distance - b.distance);
+
 
     const handleSearch = useCallback((value) => {
     setSearchText(value);
@@ -250,24 +262,24 @@ const Home = () => {
           </View>
           {/* Pastikan konten event ada dalam View yang diatur dengan flex: 1 */}
           <View style={{ flex: 1 ,marginBottom:150}}>
-            {filteredEvents.length > 0 ? (
-              filteredEvents.map((item) => (
-                <EventCard
-                  key={item.id.toString()}
-                  idevent={item.id}
-                  judul={item.EventName}
-                  deskripsi={item.EventDescription}
-                  lokasi={item.Location}
-                  tanggal={formatDate(item.RegistrationEnd)}
-                  jarak={item.distance.toFixed(2)}
-                  lat={item.Cordinate.latitude}
-                  long={item.Cordinate.longitude}
-                  url={item.ImageUrl}
-                />
-              ))
-            ) : (
-              <Text style={styles.noEventsText}>No Events Found.</Text>
-            )}
+          {sortedEvents.length > 0 ? (
+            sortedEvents.map((item) => (
+              <EventCard
+                idevent={item.id}
+                key={item.id.toString()}
+                judul={item.EventName}
+                deskripsi={item.EventDescription}
+                lokasi={item.Location}
+                tanggal={formatDate(item.RegistrationEnd)}
+                jarak={item.distance.toFixed(2)}
+                lat={item.Cordinate.latitude}
+                long={item.Cordinate.longitude}
+                url={item.ImageUrl}
+              />
+            ))
+          ) : (
+            <Text style={styles.noEventsText}>No Events Found.</Text>
+          )}
           </View>
         </View>
   

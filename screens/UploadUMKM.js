@@ -1,11 +1,16 @@
 import React, { useState,useEffect } from 'react';
-import { Image, View, Text, Linking,Button, StyleSheet, ScrollView, TextInput,ImageBackground, TouchableOpacity, Pressable } from 'react-native'; // Import TextInput
+import { Image, View,Alert, Text, Linking,Button, StyleSheet, ScrollView,LogBox, TextInput,ImageBackground, TouchableOpacity, Pressable } from 'react-native'; // Import TextInput
 import { useNavigation } from "@react-navigation/native";
 import MapView, { Marker } from 'react-native-maps';
 import categoriesData from '../assets/data/categories.json'
 import MultiSelect from 'react-native-multiple-select';
-import { auth, db } from '../firebase';
+import { auth, db,storage } from '../firebase';
 import { doc,addDoc, getDoc, collection } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import * as ImagePicker from 'expo-image-picker';
+
+
+LogBox.ignoreLogs(['VirtualizedLists should never be nested inside plain ScrollViews']);
 
 const UMKMRegistrationScreen = () => {
   const [username,setUsername] = useState('')
@@ -18,8 +23,10 @@ const UMKMRegistrationScreen = () => {
   const [alamat, setAlamat] = useState('');
   const [categories,setCategories] = useState([])
   const [user,setUser] = useState([])
+  const [uploading,setUploading] = useState(false)
   const [selectedCategories, setSelectedCategories] = useState([]);
-
+  const[image,setImage] = useState('')
+  const [imageUrl,setImageUrl] = useState('')
   const [region, setRegion] = useState({
     latitude: -6.200000,
     longitude: 106.816666,
@@ -84,8 +91,71 @@ const UMKMRegistrationScreen = () => {
     }
   };
 
+  const handleImageUpload = async () => {
+    try {
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permissionResult.granted) {
+        Alert.alert('Permission denied', 'You need to grant access to photos to use this feature.');
+        return;
+      }
+
+      const pickerResult = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+
+      if (!pickerResult.cancelled) {
+        setImage(pickerResult['assets'][0]['uri']);
+        console.log(pickerResult['assets'][0]['uri']);
+      }
+    } catch (error) {
+      console.error('Error picking image: ', error);
+    }
+  };
+const uploadImage = async () => {
+  if (!image) {
+    Alert.alert('No image selected', 'Please select an image to upload.');
+    return;
+  }
+
+  setUploading(true); // Set uploading state for UI feedback (optional)
+
+  try {
+    console.log('Fetching image from URI:', image);
+    const response = await fetch(image); // Fetch the image data using the URI
+    const blob = await response.blob(); // Convert to a blob for upload
+
+    console.log('Image fetched and converted to blob:', blob);
+
+    const filename = image.substring(image.lastIndexOf('/') + 1); // Extract filename
+    const storageRef = ref(storage, `images/${filename}`); // Get reference to the storage location
+
+    console.log('Uploading image to Firebase Storage:', filename);
+    const snapshot = await uploadBytes(storageRef, blob); // Upload the blob to Firebase Storage
+
+    console.log('Upload successful, getting download URL...');
+    const downloadURL = await getDownloadURL(snapshot.ref); // Get download URL of the uploaded image
+    setImageUrl(downloadURL.toString())
+    console.log('Download URL obtained:', downloadURL.toString());
+    const data = downloadURL.toString()
+    setUploading(false); // Reset uploading state (optional)
+    Alert.alert('Photo Uploaded!');
+    // setImage(null); // Clear the selected image state
+    return data;
+  } catch (error) {
+    console.error('Upload Error:', error);
+    setUploading(false); // Reset uploading state (optional)
+    Alert.alert('Upload Failed', 'An error occurred while uploading the image.');
+    return false;
+  }
+};
+
   const handleSubmit = async () => {
     
+    const imgUrl = await uploadImage()
+    console.log(imgUrl);
 
     const newEvent = {
       UserId : userId,
@@ -96,7 +166,8 @@ const UMKMRegistrationScreen = () => {
       Location : alamat,
       Link : umkmLink,
       IsChecked : isChecked,
-      Cordinate : {latitude : region.latitude, longitude : region.longitude}
+      Cordinate : {latitude : region.latitude, longitude : region.longitude},
+      ImageUrl : imgUrl
 
     }
 
@@ -180,7 +251,7 @@ const UMKMRegistrationScreen = () => {
         onChangeText={setAlamat}
       />
 
-<Text style={styles.label}>Pilih Lokasi</Text>
+    <Text style={styles.label}>Pilih Lokasi</Text>
         <View style={styles.mapContainer}>
           <MapView
             style={styles.map}
@@ -190,6 +261,12 @@ const UMKMRegistrationScreen = () => {
             <Marker coordinate={{ latitude: region.latitude, longitude: region.longitude }} />
           </MapView>
         </View>
+
+        <Text style={styles.label}>Upload Thumbnail (image)</Text>
+    <TouchableOpacity style={styles.button} onPress={handleImageUpload}>
+    {image && <Image source={{ uri: image }} style={styles.image} />}
+      <Text style={styles.buttonText}>Unggah Gambar Sebagai Thumbnail Postingan</Text>
+    </TouchableOpacity>
 
       <Text style={styles.label}>Upload Berkas Identitas (PDF)</Text>
       
@@ -240,6 +317,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontSize: 16,
     textAlign: 'justify',
+  },
+  image: {
+    width: 300,
+    height: 200,
+    marginTop: 20,
   },
   link: {
     color: 'blue',

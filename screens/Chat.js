@@ -2,7 +2,9 @@ import { useNavigation } from '@react-navigation/core';
 import React from 'react';
 import { View, Text, TextInput, StyleSheet, FlatList, Image, TouchableOpacity } from 'react-native';
 
-const Chat = () => {
+const Chat = ({route}) => {
+  const { uid,from } = route.params;
+
   // Dummy data for chat messages
   const messages = [
     { id: '1', text: 'Hi!', isMyMessage: true },
@@ -23,11 +25,20 @@ const Chat = () => {
     </View>
   );
 
+  const backFunction = (from) => {
+    if (from == 'Event') {
+      navigation.navigate('DetailEvent',{uid:uid})
+    } else {
+      navigation.navigate('DetailUMKM',{uid:uid})
+
+    }
+  }
+
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate('DetailEvent')} style={styles.backButton}>
+        <TouchableOpacity onPress={() => {backFunction(from)}} style={styles.backButton}>
           <Image source={require('../assets/vector-7.png')} style={styles.backIcon} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>John Doe</Text>

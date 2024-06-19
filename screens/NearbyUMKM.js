@@ -31,17 +31,18 @@ const SearchBar = ({ placeholder, onSearch }) => {
 
 
 
-const EventCard = ({  idEvent, judul, deskripsi, lokasi, jarak, lat, long }) => {
+const EventCard = ({  idEvent, judul, deskripsi, lokasi, lat, long , url, jarak}) => {
   const navigation = useNavigation()
   const randomImageUrl = `https://random.danielpetrica.com/api/random?ref=danielpetrica.com&${new Date().getTime()}`;
+  const imgUrl = url ? url : randomImageUrl
 
   return (
-    <Pressable onPress={() => navigation.navigate('DetailUMKM',{uid:idEvent})}>
+    <Pressable onPress={() => navigation.navigate('DetailUMKM',{uid:idEvent,jarak:jarak})}>
 
     <View style={styles.eventCardContainer}>
       <View>
         <ImageBackground
-          source={{ uri: randomImageUrl}}
+          source={{ uri: imgUrl}}
           style={styles.boxEvent}
           imageStyle={{ borderRadius: 20 }}>
         </ImageBackground>
@@ -90,7 +91,7 @@ const BottomNavBar = () => {
 };
 
 const NearbyUMKM = () => {
-    const route = useRoute();
+  const route = useRoute();
   const { text = '' } = route.params || {}; // Nilai default jika route.params atau text undefined
 
   const navigation = useNavigation();
@@ -165,12 +166,24 @@ useEffect(() => {
     // Do something with the search text, for example, filter data
   };
 
-  const filteredEvents = eventData.filter(event => 
-    event.Name.toLowerCase().includes(searchText.toLowerCase()) ||
-    event.Description.toLowerCase().includes(searchText.toLowerCase())
-  );
+  const filteredEvents = eventData.filter(event => {
+    const matchesSearchText = event.Name.toLowerCase().includes(searchText.toLowerCase()) ||
+                              event.Description.toLowerCase().includes(searchText.toLowerCase());
+  
+    if (text) {
+      const matchesCategory = event.Categories.some(category => category.toLowerCase().includes(text.toLowerCase()));
+      return matchesSearchText && matchesCategory;
+    }
+  
+    return matchesSearchText;
+  });
+
+  const sortedEvents = filteredEvents.sort((a, b) => a.distance - b.distance);
+
+
+
   return (
-    <View>
+    <View style={styles.pageContainer}>
       <View style={styles.container}>
         <View style={styles.acaraContainer}>
           
@@ -186,8 +199,8 @@ useEffect(() => {
         <ScrollView vertical showsVerticalScrollIndicator={false}>
        
         <View style={{ flex: 1 ,marginBottom:150}}>
-            {filteredEvents.length > 0 ? (
-              filteredEvents.map((item) => (
+            {sortedEvents.length > 0 ? (
+              sortedEvents.map((item) => (
                 <EventCard
                   key={item.id.toString()}
                   judul={item.Name}
@@ -197,6 +210,7 @@ useEffect(() => {
                   lat={item.Cordinate.latitude}
                   long={item.Cordinate.longitude}
                   idEvent = {item.id}
+                  url={item.ImageUrl}
                 />
               ))
             ) : (
@@ -213,11 +227,14 @@ useEffect(() => {
 };
 
 const styles = StyleSheet.create({
+  pageContainer: {
+    flex: 1,
+  },
   container: {
-    minHeight:'100%',
-    paddingVertical: 40,
-    // paddingHorizontal: 20,
-    alignItems:'center'
+    flex: 1,
+    paddingTop: 40,
+    marginBottom:70,
+    alignItems: 'center'
   },
   acaraContainer : {
     flexDirection : 'row',
@@ -259,7 +276,11 @@ const styles = StyleSheet.create({
     textAlign:'center',
     color:'white'
   },
-  
+  image: {
+    width: 200,
+    height: 200,
+    marginTop: 20,
+  },
   eventContainer : {
     gap:10,
     marginBottom:430
@@ -329,12 +350,13 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     width: '100%',
+    textAlign: 'center',
     zIndex: 999,
   },
   buttonNavDown: {
     padding: 10,
-    textAlign:'center',
-    alignItems:'center'
+    textAlign: 'center',
+    alignItems: 'center'
   },
 });
 

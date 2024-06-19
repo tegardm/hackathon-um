@@ -6,7 +6,7 @@ import { auth, db } from '../firebase';
 import { doc, getDoc } from 'firebase/firestore';
 
 const EventDetail = ({ route }) => {
-  const { uid } = route.params;
+  const { uid,jarak } = route.params;
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
@@ -114,6 +114,8 @@ const EventDetail = ({ route }) => {
           <View style={styles.infoContainer}>
             <Text style={styles.label}>Alamat Lokasi:</Text>
             <Text style={styles.value}>{eventDetails.location}</Text>
+            <Text style={[styles.value,{fontSize:12}]}>Jarak lokasi anda dari titik lokasi UMKM sekitar {jarak} Km</Text>
+
           </View>
           <View style={styles.infoContainer}>
             <Text style={styles.label}>Waktu Jam Acara:</Text>
@@ -140,7 +142,7 @@ const EventDetail = ({ route }) => {
         <TouchableOpacity style={styles.button} onPress={() => Linking.openURL(`https://www.google.com/maps?q=${eventDetails.region.latitude},${eventDetails.region.longitude}`)}>
           <Text style={styles.buttonText}>Lihat Map</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Chat')}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Chat',{uid:uid,from:'Event'})}>
           <Text style={styles.buttonText}>Chat</Text>
         </TouchableOpacity>
       </View>

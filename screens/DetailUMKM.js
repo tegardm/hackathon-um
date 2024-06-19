@@ -6,7 +6,7 @@ import { auth, db } from '../firebase';
 import { doc, getDoc } from 'firebase/firestore';
 
 const DetailUMKM = ({ route }) => {
-    const { uid } = route.params;
+    const { uid,jarak } = route.params;
     const [event, setEvent] = useState(null);
     const [loading, setLoading] = useState(true);
     const navigation = useNavigation();
@@ -53,7 +53,7 @@ const DetailUMKM = ({ route }) => {
     }
   
     const eventDetails = {
-      thumbnail: `https://random.danielpetrica.com/api/random?ref=danielpetrica.com&${new Date().getTime()}`,
+      thumbnail: event?.ImageUrl || `https://random.danielpetrica.com/api/random?ref=danielpetrica.com&${new Date().getTime()}`,
       name: event?.Name || 'Nama Event',
       description: event?.Description || 'Deskripsi event yang sangat menarik dan informatif.',
       category: event?.Category || 'Kategori Event',
@@ -65,7 +65,7 @@ const DetailUMKM = ({ route }) => {
         longitude: event?.Cordinate?.longitude || 0,
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421,
-      },
+      }
     };
   
     return (
@@ -93,6 +93,8 @@ const DetailUMKM = ({ route }) => {
             <View style={styles.infoContainer}>
               <Text style={styles.label}>Alamat Lokasi:</Text>
               <Text style={styles.value}>{eventDetails.location}</Text>
+              <Text style={[styles.value,{fontSize:12}]}>Jarak lokasi anda dari titik lokasi UMKM sekitar {jarak} Km</Text>
+
             </View>
           
             <View style={styles.mapContainer}>
@@ -112,7 +114,7 @@ const DetailUMKM = ({ route }) => {
           <TouchableOpacity style={styles.button} onPress={() => Linking.openURL(`https://www.google.com/maps?q=${eventDetails.region.latitude},${eventDetails.region.longitude}`)}>
             <Text style={styles.buttonText}>Lihat Map</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Chat')}>
+          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Chat',{uid:uid,from:'UMKM'})}>
             <Text style={styles.buttonText}>Chat</Text>
           </TouchableOpacity>
         </View>

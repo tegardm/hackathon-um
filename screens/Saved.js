@@ -31,7 +31,7 @@ const EventCard = ({ idevent,judul, deskripsi, lokasi, tanggal, jarak, lat, long
   const randomImageUrl = `https://random.danielpetrica.com/api/random?ref=danielpetrica.com&${new Date().getTime()}`;
   const imgUrl = url ? url : randomImageUrl
   return (
-    <Pressable onPress={() => navigation.navigate('DetailEvent', {uid: idevent})}>
+    <Pressable onPress={() => navigation.navigate('DetailEvent', {uid: idevent,jarak:jarak})}>
       <View style={styles.eventCardContainer}>
         <View>
           <ImageBackground
@@ -147,10 +147,20 @@ const Saved = () => {
     fetchUserData();
   }, []);
 
-  const filteredEvents = eventData.filter(event =>
-    event.EventName.toLowerCase().includes(searchText.toLowerCase()) ||
-    event.EventDescription.toLowerCase().includes(searchText.toLowerCase())
-  );
+  const filteredEvents = eventData.filter(event => {
+    const matchesSearchText = event.EventName.toLowerCase().includes(searchText.toLowerCase()) ||
+                              event.EventDescription.toLowerCase().includes(searchText.toLowerCase());
+  
+    if (text) {
+      const matchesCategory = event.Categories.some(category => category.toLowerCase().includes(text.toLowerCase()));
+      return matchesSearchText && matchesCategory;
+    }
+  
+    return matchesSearchText;
+  });
+
+  const sortedEvents = filteredEvents.sort((a, b) => a.distance - b.distance);
+
 
   const handleSearch = (value) => {
     setSearchText(value);
@@ -176,10 +186,10 @@ const Saved = () => {
           <Text style={styles.acaraRibbon}>{text ? `Acara Dengan Kategori ${text}` : 'Acara sekitar Anda'}</Text>
         </View>
         <ScrollView style={styles.scrollView}>
-          {filteredEvents.length > 0 ? (
-            filteredEvents.map((item) => (
+          {sortedEvents.length > 0 ? (
+            sortedEvents.map((item) => (
               <EventCard
-              idevent={item.id}
+                idevent={item.id}
                 key={item.id.toString()}
                 judul={item.EventName}
                 deskripsi={item.EventDescription}
@@ -259,6 +269,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 15,
     paddingBottom: 10,
+    marginLeft:15,
+    marginBottom:15,
     borderBottomWidth: 1,
     borderBottomColor: 'lightgray'
   },
