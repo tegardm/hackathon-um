@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Pressable, Image } from 'react-native';
 import { collection, query, onSnapshot, doc, getDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { useNavigation } from '@react-navigation/core';
@@ -91,6 +91,13 @@ const ChatDashboard = () => {
 
   return (
     <View style={styles.container}>
+        <View style={styles.container2}>
+        <Pressable onPress={() => navigation.navigate('Home')}>
+            <Image source={require('../assets/vector-7.png')}/>
+        </Pressable>
+            <Text style={styles.categoriesTitle}>Chat</Text> 
+        </View>
+        
       <FlatList
         data={chats}
         renderItem={renderChatItem}
@@ -122,6 +129,20 @@ const styles = StyleSheet.create({
   chatTimestamp: {
     fontSize: 14,
     color: '#999',
+  },
+  categoriesTitle : {
+    fontSize : 21,
+    fontWeight:'bold',
+    paddingBottom : 10,
+  borderBottomWidth:3,
+  borderBottomColor:'#ac1484',
+  },
+  container2: {
+    paddingVertical: 40,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+        alignItems: 'center', // Center the items vertically in the row
+        justifyContent: 'space-between', // Add space between the items if you want to spread them out 
   },
 });
 

@@ -137,7 +137,7 @@ const Chat = ({route}) => {
           value={text}
         />
         <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-          <Image source={require('../assets/vector-7.png')} style={styles.sendIcon} />
+          <Image source={require('../assets/send_1.png')} style={styles.sendIcon} />
         </TouchableOpacity>
       </View>
     </View>
@@ -146,6 +146,8 @@ const Chat = ({route}) => {
 
 const styles = StyleSheet.create({
   container: {
+    paddingVertical: 40,
+    paddingHorizontal: 20,
     flex: 1,
     backgroundColor: '#fff',
   },
