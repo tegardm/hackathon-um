@@ -472,14 +472,29 @@ const uploadImage = async () => {
       <Text style={styles.buttonText}>Unggah Gambar Sebagai Thumbnail Postingan</Text>
     </TouchableOpacity>
 
-    <Text style={styles.label}>Unggah Proposal (PDF)</Text>
+    <Text style={styles.label}>Surat Keterangan dari kelurahan Setempat (300 - 500) / Surat permohonan izin keramian (1000+)</Text>
     <TouchableOpacity style={styles.button} onPress={handleFilePick}>
-      <Text style={styles.buttonText}>Unggah Proposal Sesuai Format</Text>
+      <Text style={styles.buttonText}>Unggah Dokumen</Text>
     </TouchableOpacity>
 
-    <Text style={styles.label}>Unggah Surat Pernyataan (PDF)</Text>
+    <Text style={styles.label}>Foto KTP penanggung jawab acara</Text>
     <TouchableOpacity style={styles.button} onPress={handleFilePick}>
-      <Text style={styles.buttonText}>Unggah Surat Pernyataan Dengan Tanda Tangan & Materai</Text>
+      <Text style={styles.buttonText}>Unggah Dokumen</Text>
+    </TouchableOpacity>
+
+        <Text style={styles.label}>Foto KK penanggung jawab acara</Text>
+    <TouchableOpacity style={styles.button} onPress={handleFilePick}>
+      <Text style={styles.buttonText}>Unggah Dokumen</Text>
+    </TouchableOpacity>
+
+    <Text style={styles.label}>Proposal kegiatan</Text>
+    <TouchableOpacity style={styles.button} onPress={handleFilePick}>
+      <Text style={styles.buttonText}>Unggah Dokumen</Text>
+    </TouchableOpacity>
+
+    <Text style={styles.label}>Surat Izin Tempat berlangsungnya kegiatan</Text>
+    <TouchableOpacity style={styles.button} onPress={handleFilePick}>
+      <Text style={styles.buttonText}>Unggah Dokumen</Text>
     </TouchableOpacity>
 
     <Text style={styles.label}>Tautan Berkas</Text>
