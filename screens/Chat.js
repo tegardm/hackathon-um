@@ -99,7 +99,9 @@ const Chat = ({route}) => {
   const backFunction = (from) => {
     if (from == 'Event') {
       navigation.navigate('DetailEvent',{uid:uid})
-    } else {
+    }else if(from == 'Dashboard'){
+      navigation.replace('ChatDashboard')
+    }else {
       navigation.navigate('DetailUMKM',{uid:uid})
 
     }

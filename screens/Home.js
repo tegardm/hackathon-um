@@ -42,8 +42,11 @@ const NavTop = ({ username, city }) => {
         <Text style={styles.usernameNav}>{username ?? 'Loading...'}</Text>
       </View>
       <View style={styles.navInfo}>
-        <Pressable onPress={() => navigation.replace("Notification1")}>
-          <Icon name="bell" size={25} color="#ac1484" />
+        <Pressable onPress={() => navigation.navigate("ChatDashboard")}>
+        <Image 
+        source={require('../assets/message.png')} 
+        style={{ width: 25, height: 25 }} 
+      />
         </Pressable>
         <Pressable onPress={() => navigation.replace("Profile")}>
           <View style={styles.profileImageContainer}>
@@ -90,7 +93,7 @@ const EventCard = ({idevent, judul, deskripsi, lokasi, tanggal, jarak, lat, long
             imageStyle={{ borderRadius: 20 }}>
           </ImageBackground>
         </View>
-        <View>
+        <View> 
           <Text style={styles.eventTitle}>{judul}</Text>
           <Text style={styles.eventDesc}>{deskripsi.substring(0,75)+'...'}</Text>
           
