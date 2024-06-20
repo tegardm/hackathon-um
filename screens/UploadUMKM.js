@@ -9,7 +9,6 @@ import { doc,addDoc, getDoc, collection } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import * as ImagePicker from 'expo-image-picker';
 
-
 LogBox.ignoreLogs(['VirtualizedLists should never be nested inside plain ScrollViews']);
 
 const UMKMRegistrationScreen = () => {
