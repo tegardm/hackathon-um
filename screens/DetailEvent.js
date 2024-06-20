@@ -1,19 +1,26 @@
 import { useNavigation } from '@react-navigation/core';
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Linking, SafeAreaView, ActivityIndicator } from 'react-native';
+import { View, Text, Image, Alert, StyleSheet, ScrollView, TouchableOpacity, Linking, SafeAreaView, ActivityIndicator } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { auth, db } from '../firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { addDoc, arrayUnion, doc, getDoc, getFirestore, updateDoc } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
 const EventDetail = ({ route }) => {
   const { uid,jarak } = route.params;
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
+  const [haveUMKM, setHaveUMKM] = useState(false);
+  const [userData, setUserData] = useState('')
+  const [shouldRenderButton, setShouldRenderButton] = useState(true);
 
   useEffect(() => {
+
     const fetchEvent = async () => {
       try {
+        
+
         const docRef = doc(db, 'events', uid);
         const docSnap = await getDoc(docRef);
 
@@ -22,6 +29,8 @@ const EventDetail = ({ route }) => {
         } else {
           console.log('No such document!');
         }
+
+     
       } catch (error) {
         console.error('Error fetching document: ', error);
       } finally {
@@ -31,6 +40,29 @@ const EventDetail = ({ route }) => {
 
     fetchEvent();
   }, [uid]);
+
+  useEffect(() => {
+     const fetchUser = async () => {
+      const user = auth.currentUser;
+        console.log('Current user:', user);
+        if (user) {
+          const userDocRef = doc(db, 'users', user.uid);
+          const userDoc = await getDoc(userDocRef);
+          if (userDoc.exists()) {
+            await setUserData(userDoc.data());
+            console.log(userData.Username);
+          } else {
+            setError('No user data found.');
+          }
+        } else {
+          setError('No user is signed in.');
+        }
+     }
+
+     fetchUser()
+  },[])
+
+  
 
   if (loading) {
     return (
@@ -64,8 +96,62 @@ const EventDetail = ({ route }) => {
     const date = firebaseTimestamp.toDate();
     return date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
   };
+  
+  const handleChatButtonPress = (uid) => {
+    navigation.navigate('Chat', { uid, from: 'Event' }); // or 'DetailUMKM' based on your use case
+  };
+
+  const updateWhitelistUMKM = async () => {
+    if (userData && userData.IdUMKM && eventDetails && eventDetails.dataUMKM) {
+      const isIdUMKMPresent = eventDetails.dataUMKM.some(item => item.idumkm === userData.IdUMKM);
+      if (isIdUMKMPresent) {
+        Alert.alert('Anda Sudah Mendaftar Silahkan Menunggu Konfirmasi Pemilik Event...')
+        return false;
+      }
+    }
+
+    const firestore = getFirestore();
+
+
+    if (uid) {
+      
+      const eventDocRef = doc(firestore, 'events', uid);
+
+      try {
+        await updateDoc(eventDocRef, {
+          DataUMKM : arrayUnion({
+            status : false,
+            action : false,
+            idumkm : userData.IdUMKM
+          })
+        });
+        console.log('Profile Updated');
+        Alert.alert("Pendaftaran anda berhasil terkirim")
+      } catch (error) {
+        console.error('Error updating profile: ', error);
+      }
+    }
+  }
+
+  const handleConfirm = () => {
+    Alert.alert(
+      'Konfirmasi',
+      'Apakah Anda yakin ingin mendaftar acara ini?',
+      [
+        { text: 'Batal', style: 'cancel' },
+        { text: 'Ya', onPress: () => executeUpdate() }
+      ],
+      { cancelable: true }
+    );
+  };
+
+  const executeUpdate = () => {
+    // Panggil fungsi updateWhitelistUMKM di sini setelah konfirmasi
+    updateWhitelistUMKM(); // Pastikan Anda memanggil fungsi ini sesuai dengan kebutuhan Anda
+  };
 
   const eventDetails = {
+    authorId : event.UserId || 'none',
     thumbnail: event.ImageUrl || `https://random.danielpetrica.com/api/random?ref=danielpetrica.com&${new Date().getTime()}`,
     name: event.EventName || 'Nama Event',
     description: event.EventDescription || 'Deskripsi event yang sangat menarik dan informatif.',
@@ -77,6 +163,8 @@ const EventDetail = ({ route }) => {
     endTime: event.EndTime ? formatTime(event.EndTime) : 'Invalid time',
     location: event.Location || 'Jl. Contoh Alamat No. 123, Kota Contoh',
     moreInfoLink: event.MoreInfoLink || 'https://info-lebih-lanjut.com',
+    dataUMKM : event.DataUMKM || [],
+    username : event.Username,
     umkmApplyDeadline: event.RegistrationEnd ? formatDate(event.RegistrationEnd) : 'Invalid date',
     region: {
       latitude: event.Cordinate?.latitude || 0,
@@ -85,6 +173,12 @@ const EventDetail = ({ route }) => {
       longitudeDelta: 0.0421,
     },
   };
+
+
+    // Cek apakah userData.IdUMKM tidak ada dalam eventDetails.DataUMKM
+    
+    console.log(userData);
+    console.log(eventDetails);
 
   return (
     <SafeAreaView style={styles.safeContainer}>
@@ -138,15 +232,36 @@ const EventDetail = ({ route }) => {
           <TouchableOpacity style={styles.moreInfoContainer} onPress={() => Linking.openURL(eventDetails.moreInfoLink)}>
             <Text style={styles.moreInfoLink}>Info Lebih Lanjut</Text>
           </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('ListedUMKM',{idEvent:uid, dataUMKM:eventDetails.dataUMKM})} style={styles.button} >
+            <Text style={styles.buttonText}>Lihat List UMKM Terdaftar</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={() => Linking.openURL(`https://www.google.com/maps?q=${eventDetails.region.latitude},${eventDetails.region.longitude}`)}>
           <Text style={styles.buttonText}>Lihat Map</Text>
         </TouchableOpacity>
-        {/* <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Chat',{uid:uid,from:'Event'})}>
+        <>
+        { userData && eventDetails && userData.Username != eventDetails.username && userData.HaveUMKM == true ? (
+          <>
+        <TouchableOpacity style={styles.button} onPress={() => handleChatButtonPress(eventDetails.authorId)}>
           <Text style={styles.buttonText}>Chat</Text>
-        </TouchableOpacity> */}
+        </TouchableOpacity>
+            <>
+            
+              <TouchableOpacity 
+                style={styles.button}
+                onPress={handleConfirm}
+              >
+                <Text style={styles.buttonText}>Daftar Acara</Text>
+              </TouchableOpacity>
+            
+          </>
+          </>
+        ) : null}
+
+
+      </>
       </View>
     </SafeAreaView>
   );
@@ -214,7 +329,8 @@ const styles = StyleSheet.create({
   },
   moreInfoContainer: {
     alignItems: 'center',
-    marginTop: 20,
+    marginVertical: 20,
+    
   },
   moreInfoLink: {
     fontSize: 18,
@@ -239,7 +355,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   buttonText: {
-    fontSize: 18,
+    fontSize: 14,
     color: '#fff',
     fontWeight: 'bold',
   },

@@ -5,7 +5,7 @@ import RNPickerSelect from 'react-native-picker-select';
 import MapView, { Marker } from 'react-native-maps';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import app,{ auth, db, storage } from '../firebase';
-import { doc,addDoc, getDoc, collection } from 'firebase/firestore';
+import { doc,addDoc, getDoc, collection, updateDoc } from 'firebase/firestore';
 import categoriesData from '../assets/data/categories.json'
 import MultiSelect from 'react-native-multiple-select';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -53,6 +53,7 @@ const CreateEvent = () => {
   const [isMap, setIsMap] = useState(true)
   const [image, setImage] = useState('');
   const [uploading,setUploading] = useState(false)
+  const [number, setNumber] = useState('');
   const [imageUrl,setImageUrl] = useState('')
   useEffect(() => {
     const data = categoriesData.map((category, index) => ({
@@ -205,6 +206,7 @@ const uploadImage = async () => {
   const handleSubmit = async () => {
     try {
 
+
       const sourceImg = await uploadImage()
       const newEvent = {
         UserId : userId,
@@ -216,17 +218,22 @@ const uploadImage = async () => {
         EventDateEnd : eventDateEnd,
         Location : location,
         Link : link,
+        NumberUMKM : number,
         StartTime : startTime,
         EndTime : endTime,
         RegistrationEnd : registrationEnd,
         IsChecked : isChecked,
+        DataUMKM : [],
         Cordinate : {latitude : region.latitude, longitude : region.longitude},
         ImageUrl :  sourceImg // Pastikan imageUrl diisi dengan nilai yang diperoleh dari Firebase Storage
       };
+
   
       const docRef = await addDoc(collection(db, 'events'), newEvent);
       console.log('Document written with ID:', docRef.id);
-  
+
+
+   
       navigation.navigate('UploadReview');
     } catch (error) {
       console.error('Error handling submit:', error);
@@ -276,6 +283,14 @@ const uploadImage = async () => {
     }
   };
 
+  const handleChangeNum = (text) => {
+    // Hanya izinkan input angka
+    if (/^\d*$/.test(text)) {
+      setNumber(text);
+    }
+  };
+
+
   return (
     <View style={styles.container}>
       <ScrollView style={{marginBottom:20}} vertical showsVerticalScrollIndicator={false}>
@@ -305,6 +320,15 @@ const uploadImage = async () => {
       onChangeText={setEventDescription}
       multiline
     />
+    <Text style={styles.label}>Masukkan Jumlah UMKM yang dapat diterima :</Text>
+      <TextInput
+        style={styles.input}
+        value={number}
+        placeholder="Jumlah UMKM"
+        onChangeText={handleChangeNum}
+        keyboardType="numeric"
+        maxLength={4}  // Batas maksimum karakter yang diizinkan
+      />
         </View>
         <View style={styles.categoryContainer}>
           <Text  style={[styles.label,{marginBottom:15}]}>Kategori</Text>

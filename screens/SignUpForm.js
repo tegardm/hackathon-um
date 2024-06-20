@@ -68,6 +68,8 @@ const SignUpForm = () => {
         Username: username,
         Email: email,
         Domisili: domisili,
+        HaveUMKM : false,
+        IdUMKM: '',
         location: {
           latitude: region.latitude,
           longitude: region.longitude,

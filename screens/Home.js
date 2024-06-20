@@ -42,6 +42,12 @@ const NavTop = ({ username, city }) => {
         <Text style={styles.usernameNav}>{username ?? 'Loading...'}</Text>
       </View>
       <View style={styles.navInfo}>
+      <Pressable onPress={() => navigation.navigate("ChatDashboard")}>
+        <Image 
+        source={require('../assets/message.png')} 
+        style={{ width: 25, height: 25 }} 
+      />
+        </Pressable>
         <Pressable onPress={() => navigation.replace("Notification1")}>
           <Icon name="bell" size={25} color="#ac1484" />
         </Pressable>
@@ -76,12 +82,46 @@ const Category = ({ text }) => {
   );
 };
 
+const UMKMCard = ({  idEvent, judul, deskripsi, lokasi, lat, long , url, jarak}) => {
+  const navigation = useNavigation()
+  const randomImageUrl = `https://random.danielpetrica.com/api/random?ref=danielpetrica.com&${new Date().getTime()}`;
+  const imgUrl = url ? url : randomImageUrl
+
+  return (
+    <Pressable onPress={() => navigation.navigate('DetailUMKM',{uid:idEvent,jarak:jarak})}>
+
+    <View style={styles.eventCardContainer}>
+      <View>
+        <ImageBackground
+          source={{ uri: imgUrl}}
+          style={styles.boxEvent}
+          imageStyle={{ borderRadius: 20 }}>
+        </ImageBackground>
+      </View>
+      <View>
+        <Text style={styles.eventTitle}>{judul ? `UMKM ${judul}` : 'Nama UMKM'}</Text>
+        <Text style={styles.eventDesc}>
+            {deskripsi.substring(0,75)+'...'}
+            </Text>
+
+        
+        <View style={styles.dateDistance}>
+        <Text style={styles.eventDate}>
+        <Icon name="location-arrow" size={12} color="gray" style={styles.searchIcon} /> {lokasi}</Text>
+          <Text style={styles.eventDistance}>{jarak} Km</Text>
+        </View>
+      </View>
+    </View>
+    </Pressable>
+  )
+}
+
 const EventCard = ({idevent, judul, deskripsi, lokasi, tanggal, jarak, lat, long, url }) => {
   const navigation = useNavigation();
   const randomImageUrl = `https://random.danielpetrica.com/api/random?ref=danielpetrica.com&${new Date().getTime()}`;
   const imgUrl = url ? url : randomImageUrl
   return (
-    <Pressable onPress={() => navigation.navigate('DetailEvent', {uid: idevent})}>
+    <Pressable onPress={() => navigation.navigate('DetailEvent', {uid: idevent,jarak:jarak})}>
       <View style={styles.eventCardContainer}>
         <View>
           <ImageBackground
@@ -141,6 +181,8 @@ const Home = () => {
   const [categories, setCategories] = useState(categoryData.slice(0, 6));
   const [userData, setUserData] = useState({});
   const [eventData, setEventData] = useState([]);
+  const [umkmData, setUmkmData] = useState([]);
+
   const [error, setError] = useState(null);
   const [searchText, setSearchText] = useState('');
   const route = useRoute();
@@ -180,12 +222,21 @@ const Home = () => {
             const userLng = data.location.longitude;
 
             const dataDocRef = await getDocs(collection(db, 'events'));
+
             const docsData = dataDocRef.docs.map(doc => ({
               id: doc.id,
               ...doc.data(),
               distance: calculateDistance(userLat, userLng, doc.data().Cordinate.latitude, doc.data().Cordinate.longitude)
             }));
             setEventData(docsData);
+            const umkmDocDef = await getDocs(collection(db, 'umkms'));
+
+            const umkmData = umkmDocDef.docs.map(doc => ({
+              id: doc.id,
+              ...doc.data(),
+              distance: calculateDistance(userLat, userLng, doc.data().Cordinate.latitude, doc.data().Cordinate.longitude)
+            }));
+            setUmkmData(umkmData);
           } else {
             setError('No user data found.');
           }
@@ -215,7 +266,20 @@ const Home = () => {
     return matchesSearchText;
   });
 
+  const filteredEventsUMKM = umkmData.filter(event => {
+    const matchesSearchText = event.Name.toLowerCase().includes(searchText.toLowerCase()) ||
+                              event.Description.toLowerCase().includes(searchText.toLowerCase());
+  
+    if (text) {
+      const matchesCategory = event.Categories.some(category => category.toLowerCase().includes(text.toLowerCase()));
+      return matchesSearchText && matchesCategory;
+    }
+  
+    return matchesSearchText;
+  });
+
   const sortedEvents = filteredEvents.sort((a, b) => a.distance - b.distance);
+  const sortedEventsUMKM = filteredEventsUMKM.sort((a, b) => a.distance - b.distance);
 
 
     const handleSearch = useCallback((value) => {
@@ -261,7 +325,7 @@ const Home = () => {
             </Pressable>
           </View>
           {/* Pastikan konten event ada dalam View yang diatur dengan flex: 1 */}
-          <View style={{ flex: 1 ,marginBottom:150}}>
+          <View style={{ flex: 1 ,marginBottom:30}}>
           {sortedEvents.length > 0 ? (
             sortedEvents.map((item) => (
               <EventCard
@@ -280,6 +344,33 @@ const Home = () => {
           ) : (
             <Text style={styles.noEventsText}>No Events Found.</Text>
           )}
+          </View>
+        </View>
+        <View style={{ flex: 1 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Text style={styles.categoriesTitle}>UMKM Sekitar</Text>
+            <Pressable onPress={() => navigation.replace("NearbyUMKM")}>
+              <Text style={{ color: '#ac1484' }}>Lihat Lainnya</Text>
+            </Pressable>
+          </View>
+        <View style={{ flex: 1 ,marginBottom:150}}>
+            {sortedEventsUMKM.length > 0 ? (
+              sortedEventsUMKM.map((item) => (
+                <UMKMCard
+                  key={item.id.toString()}
+                  judul={item.Name}
+                  deskripsi={item.Description}
+                  lokasi={item.Location}
+                  jarak={item.distance.toFixed(2)}
+                  lat={item.Cordinate.latitude}
+                  long={item.Cordinate.longitude}
+                  idEvent = {item.id}
+                  url={item.ImageUrl}
+                />
+              ))
+            ) : (
+              <Text style={styles.noEventsText}>No UMKM Found.</Text>
+            )}
           </View>
         </View>
   
