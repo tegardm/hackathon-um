@@ -15,6 +15,7 @@ import * as FileSystem from 'expo-file-system'
 
 
 LogBox.ignoreLogs(['VirtualizedLists should never be nested inside plain ScrollViews']);
+LogBox.ignoreLogs(['Cannot convert null value to object']);
 
 const CreateEvent = () => { 
 
@@ -62,6 +63,44 @@ const CreateEvent = () => {
 
     setCategories(data)
   
+
+    const handleDocumentPicker = async () => {
+      try {
+        const result = await DocumentPicker.getDocumentAsync({
+          type: "*/*",
+          copyToCacheDirectory: true,
+        });
+  
+        if (result.type === "success") {
+          console.log(
+            result.uri,
+            result.name,
+            result.size,
+            result.mimeType
+          );
+  
+          // Upload file to Firebase Storage
+          const uploadUri = Platform.OS === 'ios' ? result.uri.replace('file://', '') : result.uri;
+          const filename = result.name;
+          const reference = storage().ref(filename);
+  
+          const task = reference.putFile(uploadUri);
+  
+          task.on('state_changed', taskSnapshot => {
+            console.log(`${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`);
+          });
+  
+          task.then(() => {
+            Alert.alert('File uploaded to Firebase Storage');
+          });
+        } else {
+          Alert.alert('Document picking was canceled.');
+        }
+      } catch (err) {
+        console.error(err);
+        Alert.alert('An error occurred while picking the document.');
+      }
+    };
 
     const fetchUserData = async () => {
       try {

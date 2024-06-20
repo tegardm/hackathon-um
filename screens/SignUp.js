@@ -41,14 +41,7 @@ const SignUp = () => {
       >
         <Text style={[styles.logIn, styles.logInTypo]}>Log in</Text>
       </Pressable>
-      <View style={[styles.googlesignup, styles.googlesignupFlexBox]}>
-        <Image
-          style={styles.icon}
-          contentFit="cover"
-          source={require("../assets/icon2.png")}
-        />
-        <Text style={[styles.text, styles.textTypo]}>Continue with Google</Text>
-      </View>
+      
       <Pressable
         style={[styles.accountsignup, styles.googlesignupFlexBox]}
         onPress={() => navigation.navigate("SignUpForm")}
@@ -143,7 +136,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_smi,
   },
   accountsignup: {
-    top: 555,
+    top: 680,
     backgroundColor: "#c82495",
   }, title: {
     top:380,

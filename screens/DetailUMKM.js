@@ -116,9 +116,9 @@ const DetailUMKM = ({ route }) => {
           <TouchableOpacity style={styles.button} onPress={() => Linking.openURL(`https://www.google.com/maps?q=${eventDetails.region.latitude},${eventDetails.region.longitude}`)}>
             <Text style={styles.buttonText}>Lihat Map</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Chat',{uid:uid,from:'UMKM'})}>
+          {/* <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Chat',{uid:uid,from:'UMKM'})}>
             <Text style={styles.buttonText}>Chat</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </SafeAreaView>
     );
