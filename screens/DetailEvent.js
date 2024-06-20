@@ -84,6 +84,11 @@ const EventDetail = ({ route }) => {
       latitudeDelta: 0.0922,
       longitudeDelta: 0.0421,
     },
+    UserId: event.UserId || 'not_found'
+  };
+
+  const handleChatButtonPress = (uid) => {
+    navigation.navigate('Chat', { uid, from: 'Event' }); // or 'DetailUMKM' based on your use case
   };
 
   return (
@@ -144,9 +149,9 @@ const EventDetail = ({ route }) => {
         <TouchableOpacity style={styles.button} onPress={() => Linking.openURL(`https://www.google.com/maps?q=${eventDetails.region.latitude},${eventDetails.region.longitude}`)}>
           <Text style={styles.buttonText}>Lihat Map</Text>
         </TouchableOpacity>
-        {/* <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Chat',{uid:uid,from:'Event'})}>
+        <TouchableOpacity style={styles.button} onPress={() => handleChatButtonPress(eventDetails.UserId)}>
           <Text style={styles.buttonText}>Chat</Text>
-        </TouchableOpacity> */}
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );

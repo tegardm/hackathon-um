@@ -1,29 +1,100 @@
 import { useNavigation } from '@react-navigation/core';
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { View, Text, TextInput, StyleSheet, FlatList, Image, TouchableOpacity } from 'react-native';
+import { auth, db } from '../firebase';
+import { getFirestore, collection, doc, setDoc, addDoc, serverTimestamp, query, orderBy, onSnapshot, createdAt } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
 const Chat = ({route}) => {
-  const { uid,from } = route.params;
+  const { uid, from } = route.params;
+
+
+  const [messages, setMessages] = useState([]);
+  const [text, setText] = useState('');
+
+  const currentUser = auth.currentUser;
+
+  useEffect(() => {
+    const chatId = getChatId(currentUser.uid, uid);
+    const messagesQuery = query(
+      collection(db, 'chats', chatId, 'messages'),
+      orderBy('createdAt', 'desc')
+    );
+
+    const unsubscribe = onSnapshot(messagesQuery, (querySnapshot) => {
+      const messagesFirestore = querySnapshot.docs.map(doc => {
+        const firebaseData = doc.data();
+        const data = {
+          _id: doc.id,
+          text: firebaseData.text,
+          user: firebaseData.user,
+        };
+        return data;
+      });
+      setMessages(messagesFirestore);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const getChatId = (uid1, uid2) => {
+    return uid1 > uid2 ? `${uid1}-${uid2}` : `${uid2}-${uid1}`;
+  };
+
+
+  const handleSend = async () => {
+    const chatId = getChatId(currentUser.uid, uid);
+    const message = {
+      text,
+      createdAt: serverTimestamp(),
+      user: {
+        _id: currentUser.uid,
+        email: currentUser.email,
+      },
+    };
+
+    await addDoc(collection(db, 'chats', chatId, 'messages'), message);
+
+    // Optionally, update the last message and timestamp in the chat document
+    await setDoc(doc(db, 'chats', chatId), {
+      lastMessage: text,
+      lastTimestamp: serverTimestamp(),
+    }, { merge: true });
+
+    setText('');
+  };
+
+
+  const renderChatMessage = ({ item }) => (
+    <View
+      style={[
+        styles.messageContainer,
+        item.user._id === currentUser.uid ? styles.myMessage : styles.otherMessage,
+      ]}
+    >
+      <Text style={styles.messageText}>{item.text}</Text>
+    </View>
+  );
 
   // Dummy data for chat messages
-  const messages = [
-    { id: '1', text: 'Hi!', isMyMessage: true },
-    { id: '2', text: 'Hello!', isMyMessage: false },
-    { id: '3', text: 'How are you?', isMyMessage: true },
-    { id: '4', text: 'I\'m fine, thank you.', isMyMessage: false },
-    { id: '5', text: 'What are you doing?', isMyMessage: true },
-    { id: '6', text: 'Just working on some stuff.', isMyMessage: false },
-    { id: '7', text: 'Cool!', isMyMessage: true },
-  ];
+  // const messages = [
+  //   { id: '1', text: 'Hi!', isMyMessage: true },
+  //   { id: '2', text: 'Hello!', isMyMessage: false },
+  //   { id: '3', text: 'How are you?', isMyMessage: true },
+  //   { id: '4', text: 'I\'m fine, thank you.', isMyMessage: false },
+  //   { id: '5', text: 'What are you doing?', isMyMessage: true },
+  //   { id: '6', text: 'Just working on some stuff.', isMyMessage: false },
+  //   { id: '7', text: 'Cool!', isMyMessage: true },
+  // ];
 
   const navigation = useNavigation()
 
   // Render each chat message item
-  const renderChatMessage = ({ item }) => (
-    <View style={[styles.messageContainer, item.isMyMessage ? styles.myMessage : styles.otherMessage]}>
-      <Text style={styles.messageText}>{item.text}</Text>
-    </View>
-  );
+  // const renderChatMessage = ({ item }) => (
+  //   <View style={[styles.messageContainer, item.isMyMessage ? styles.myMessage : styles.otherMessage]}>
+  //     <Text style={styles.messageText}>{item.text}</Text>
+  //   </View>
+  // );
 
   const backFunction = (from) => {
     if (from == 'Event') {
@@ -41,7 +112,7 @@ const Chat = ({route}) => {
         <TouchableOpacity onPress={() => {backFunction(from)}} style={styles.backButton}>
           <Image source={require('../assets/vector-7.png')} style={styles.backIcon} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>John Doe</Text>
+        <Text style={styles.headerTitle}></Text>
         
       </View>
 
@@ -49,7 +120,7 @@ const Chat = ({route}) => {
       <FlatList
         data={messages}
         renderItem={renderChatMessage}
-        keyExtractor={item => item.id}
+        keyExtractor={(item) => item._id}
         contentContainerStyle={styles.messagesContainer}
         inverted  // Start rendering from the bottom (newest message at the bottom)
       />
@@ -60,10 +131,10 @@ const Chat = ({route}) => {
           style={styles.input}
           placeholder="Type a message..."
           multiline
-          // onChangeText={...}
-          // value={...}
+          onChangeText={setText}
+          value={text}
         />
-        <TouchableOpacity style={styles.sendButton}>
+        <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
           <Image source={require('../assets/vector-7.png')} style={styles.sendIcon} />
         </TouchableOpacity>
       </View>
