@@ -51,6 +51,10 @@ const DetailUMKM = ({ route }) => {
         </SafeAreaView>
       );
     }
+
+    const handleChatButtonPress = (uid) => {
+      navigation.navigate('Chat', { uid, from: 'UMKM' }); // or 'DetailUMKM' based on your use case
+    };
   
     const eventDetails = {
       thumbnail: event?.ImageUrl || `https://random.danielpetrica.com/api/random?ref=danielpetrica.com&${new Date().getTime()}`,
@@ -65,7 +69,8 @@ const DetailUMKM = ({ route }) => {
         longitude: event?.Cordinate?.longitude || 0,
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421,
-      }
+      },
+      UserID: event?.UserId || "None"
     };
   
     return (
@@ -116,9 +121,9 @@ const DetailUMKM = ({ route }) => {
           <TouchableOpacity style={styles.button} onPress={() => Linking.openURL(`https://www.google.com/maps?q=${eventDetails.region.latitude},${eventDetails.region.longitude}`)}>
             <Text style={styles.buttonText}>Lihat Map</Text>
           </TouchableOpacity>
-          {/* <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Chat',{uid:uid,from:'UMKM'})}>
+          <TouchableOpacity style={styles.button} onPress={() => handleChatButtonPress(eventDetails.UserID)}>
             <Text style={styles.buttonText}>Chat</Text>
-          </TouchableOpacity> */}
+          </TouchableOpacity>
         </View>
       </SafeAreaView>
     );
@@ -211,7 +216,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   buttonText: {
-    fontSize: 18,
+    fontSize: 14,
     color: '#fff',
     fontWeight: 'bold',
   },

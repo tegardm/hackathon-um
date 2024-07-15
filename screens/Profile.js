@@ -123,7 +123,12 @@ const Profile =  () => {
     <View style={styles.containerButtons}>
     <ProfileButton address='EditProfile' text='Atur Profil'/>
       <ProfileButton address='Notification1' text='Notifikasi'/>
-      <ProfileButton address='UploadUMKM' text='Daftar Menjadi UMKM'/>
+      {userData && !userData.HaveUMKM ? (
+            <ProfileButton address='UploadUMKM' text='Daftar Menjadi UMKM'/>
+
+    ) : (
+        <></>
+    )}
       <ProfileButton address='CreateEvent' text='Buat Acara'/>
       <LogoutButton   onPress={() => Linking.openURL('https://example.com/syarat-berkas')} text='Dukungan'/>
       <LogoutButton  text='Keluar' onPress={() => handleSignout()}/>

@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Pressable, Image } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Pressable, Image } from 'react-native';
 import { collection, query, onSnapshot, doc, getDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { useNavigation } from '@react-navigation/core';
-import { getFirestore } from 'firebase/firestore';
-import { initializeApp } from 'firebase/app';
 import { auth, db } from '../firebase';
 
 const ChatDashboard = () => {
@@ -15,26 +13,19 @@ const ChatDashboard = () => {
 
   useEffect(() => {
     if (currentUser) {
-      console.log('Current user ID:', currentUser.uid);  // Log current user ID
-      const chatsQuery = query(
-        collection(db, 'chats')
-      );
+      const chatsQuery = query(collection(db, 'chats'));
 
       const unsubscribe = onSnapshot(chatsQuery, async (querySnapshot) => {
         const chatsFirestore = querySnapshot.docs
           .filter(doc => doc.id.includes(currentUser.uid))
           .map(doc => {
             const firebaseData = doc.data();
-            const data = {
+            return {
               _id: doc.id,
-              ...firebaseData
+              ...firebaseData,
             };
-            return data;
           });
 
-        console.log('Fetched chats:', chatsFirestore);  // Log fetched chats
-
-        // Fetch user names for all chats
         const chatsWithNames = await Promise.all(chatsFirestore.map(async (chat) => {
           const otherParticipant = chat._id.replace(currentUser.uid, '').replace('-', '');
           const userDoc = await getDoc(doc(db, 'users', otherParticipant));
@@ -52,7 +43,6 @@ const ChatDashboard = () => {
 
       return () => unsubscribe();
     } else {
-      console.log('No authenticated user');  // Log if no user is authenticated
       setLoading(false);
     }
   }, [currentUser]);
@@ -62,21 +52,16 @@ const ChatDashboard = () => {
   };
 
   const renderChatItem = ({ item }) => (
-    <TouchableOpacity onPress={() => handleChatPress(item._id, item.otherParticipant)}>
-      <View style={styles.chatItem}>
-        <Text style={styles.chatName}>{item.otherParticipantName}</Text>
-        <Text style={styles.chatMessage}>{item.lastMessage}</Text>
-        <Text style={styles.chatTimestamp}>
-          {item.lastTimestamp ? new Date(item.lastTimestamp.seconds * 1000).toLocaleString() : 'Unknown Time'}
-        </Text>
-      </View>
-    </TouchableOpacity>
+    <ChatItem
+      chat={item}
+      onPress={() => handleChatPress(item._id, item.otherParticipant)}
+    />
   );
 
   if (loading) {
     return (
-      <View style={styles.container}>
-        <Text>Loading...</Text>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#007BFF" />
       </View>
     );
   }
@@ -91,27 +76,57 @@ const ChatDashboard = () => {
 
   return (
     <View style={styles.container}>
-        <View style={styles.container2}>
+      <View style={styles.container2}>
         <Pressable onPress={() => navigation.navigate('Home')}>
             <Image source={require('../assets/vector-7.png')}/>
         </Pressable>
             <Text style={styles.categoriesTitle}>Chat</Text> 
         </View>
-        
       <FlatList
         data={chats}
         renderItem={renderChatItem}
         keyExtractor={item => item._id}
+        contentContainerStyle={styles.chatList}
       />
     </View>
   );
 };
 
+const ChatItem = ({ chat, onPress }) => (
+  <TouchableOpacity onPress={onPress} style={styles.chatItem}>
+    <Text style={styles.chatName}>{chat.otherParticipantName}</Text>
+    <Text style={styles.chatMessage}>{chat.lastMessage}</Text>
+    <Text style={styles.chatTimestamp}>
+      {chat.lastTimestamp ? new Date(chat.lastTimestamp.seconds * 1000).toLocaleString() : 'Unknown Time'}
+    </Text>
+  </TouchableOpacity>
+);
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    padding: 16,
+    paddingVertical: 40,
+    paddingHorizontal: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  homeButton: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#ac1484',
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  homeButtonText: {
+    color: '#FFF',
+    fontWeight: 'bold',
+  },
+  chatList: {
+    paddingBottom: 16,
   },
   chatItem: {
     padding: 16,
@@ -125,10 +140,17 @@ const styles = StyleSheet.create({
   chatMessage: {
     fontSize: 16,
     color: '#555',
+    marginTop: 4,
   },
   chatTimestamp: {
     fontSize: 14,
     color: '#999',
+    marginTop: 4,
+  },
+  container2: {
+    flexDirection: 'row',
+    alignItems: 'center', 
+    justifyContent: 'space-between', 
   },
   categoriesTitle : {
     fontSize : 21,
@@ -136,13 +158,6 @@ const styles = StyleSheet.create({
     paddingBottom : 10,
   borderBottomWidth:3,
   borderBottomColor:'#ac1484',
-  },
-  container2: {
-    paddingVertical: 40,
-    paddingHorizontal: 20,
-    flexDirection: 'row',
-        alignItems: 'center', // Center the items vertically in the row
-        justifyContent: 'space-between', // Add space between the items if you want to spread them out 
   },
 });
 

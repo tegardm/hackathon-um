@@ -5,9 +5,10 @@ import MapView, { Marker } from 'react-native-maps';
 import categoriesData from '../assets/data/categories.json'
 import MultiSelect from 'react-native-multiple-select';
 import { auth, db,storage } from '../firebase';
-import { doc,addDoc, getDoc, collection } from 'firebase/firestore';
+import { doc,addDoc, getDoc, collection, getFirestore, updateDoc } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import * as ImagePicker from 'expo-image-picker';
+import { getAuth, updateProfile } from 'firebase/auth';
 
 LogBox.ignoreLogs(['Cannot convert null value to object']);
 
@@ -79,6 +80,7 @@ const UMKMRegistrationScreen = () => {
     fetchUserData();
 
   },[])
+
 
 
   const handleSelectedItemsChange = (selectedItems) => {
@@ -154,9 +156,9 @@ const uploadImage = async () => {
 };
 
   const handleSubmit = async () => {
+     
     
     const imgUrl = await uploadImage()
-    console.log(imgUrl);
 
     const newEvent = {
       UserId : userId,
@@ -173,6 +175,25 @@ const uploadImage = async () => {
     }
 
     const docRef = await addDoc(collection(db, 'umkms'), newEvent);
+
+    const auth = getAuth();
+    const firestore = getFirestore();
+    const user = auth.currentUser;
+    
+  
+    if (user) {
+      const userDocRef = doc(firestore, 'users', user.uid);
+
+      try {
+        await updateDoc(userDocRef, {
+          HaveUMKM: true,
+          IdUMKM : docRef.id
+        });
+        console.log('Profile Updated');
+      } catch (error) {
+        console.error('Error updating profile: ', error);
+      }
+    }
 
     // console.log('Document written with ID:', docRef.id);
     navigation.navigate('UploadReview');
@@ -269,18 +290,28 @@ const uploadImage = async () => {
       <Text style={styles.buttonText}>Unggah Gambar Sebagai Thumbnail Postingan</Text>
     </TouchableOpacity>
 
-      <Text style={styles.label}>Upload Berkas Identitas (PDF)</Text>
+      <Text style={styles.label}>Surat keterangan tidak berprofesi sebagai ASN, pegawai BUMN/BUMD, tentara dan polisi :</Text>
       
       <TouchableOpacity style={styles.button}>
         <Text style={styles.buttonText}>Pilih Berkas</Text>
       </TouchableOpacity>
 
-      <Text style={styles.label}>Upload Berkas Usaha (PDF)</Text>
+      <Text style={styles.label}>Dokumen Bukti Memiliki Nomor Pokok Wajib Pajak (NPWP)</Text>
       <TouchableOpacity style={styles.button}>
         <Text style={styles.buttonText}>Pilih Berkas</Text>
-      </TouchableOpacity>      
+      </TouchableOpacity>  
 
-      <Text style={styles.label}>Download Surat Pernyataan</Text>
+      <Text style={styles.label}>Dokumen Bukti Memiliki Surat Keterangan Domisili Usaha (SKDU)</Text>
+      <TouchableOpacity style={styles.button}>
+        <Text style={styles.buttonText}>Pilih Berkas</Text>
+      </TouchableOpacity>
+
+      <Text style={styles.label}>Foto KTP</Text>
+      <TouchableOpacity style={styles.button}>
+        <Text style={styles.buttonText}>Pilih Berkas</Text>
+      </TouchableOpacity>     
+
+      <Text style={styles.label}>Download Surat Keterangan</Text>
       <TouchableOpacity onPress={() => Linking.openURL('https://example.com/syarat-berkas')}>
         <Text style={styles.link}>Download Surat</Text>
       </TouchableOpacity>

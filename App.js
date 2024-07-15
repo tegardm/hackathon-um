@@ -23,6 +23,7 @@ import DetailUMKM from "./screens/DetailUMKM";
 import AprovedEvent from "./screens/AprovedEvent";
 import NearbyUMKM from "./screens/NearbyUMKM";
 import Chat from "./screens/Chat";
+import ListedUMKM from "./screens/ListedUMKM";
 import ChatDashboard from "./screens/ChatDashboard";
 
 
@@ -153,6 +154,11 @@ const App = () => {
             <Stack.Screen
               name="Chat"
               component={Chat}
+              options={{ headerShown: false }}
+            />
+             <Stack.Screen
+              name="ListedUMKM"
+              component={ListedUMKM}
               options={{ headerShown: false }}
             />
             <Stack.Screen
